@@ -43,6 +43,9 @@ impl Display for Judgement {
 }
 
 impl Judgement {
+    /// Creates the Empty Context with a WellFormed JudgementType.
+    ///
+    /// This is the starting point for all proofs.
     pub fn empty() -> Self {
         let global_context = GlobalContext::new(GLOBAL_CONTEXT_CAPACITY);
         let context = Context::new(Rc::new(RefCell::new(global_context)));

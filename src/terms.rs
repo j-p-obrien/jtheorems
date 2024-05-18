@@ -24,18 +24,18 @@ pub enum TermData {
     Variable(VariableData),
     Lambda(LambdaData),
     Application(ApplicationData),
-    Universe(Universe),
+    //Universe(Universe),
     PiType(PiTypeData),
     SigmaType(SigmaTypeData),
     Pair(PairData),
     CoproductType(CoproductTypeData),
     Left(LeftData),
     Right(RightData),
-    EmptyType(EmptyType),
-    UnitType(UnitType),
-    Unit(Unit),
-    NaturalType(NaturalType),
-    Zero(Zero),
+    //EmptyType(EmptyType),
+    //UnitType(UnitType),
+    //Unit(Unit),
+    //NaturalType(NaturalType),
+    //Zero(Zero),
     Succ(SuccData),
     IdentityType(IdentityTypeData),
     Refl(ReflData),
@@ -61,6 +61,18 @@ pub enum Term {
     Succ(Succ),
     IdentityType(IdentityType),
     Refl(Refl),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Type {
+    Variable(Variable),
+    PiType(PiType),
+    SigmaType(SigmaType),
+    CoproductType(CoproductType),
+    EmptyType(EmptyType),
+    UnitType(UnitType),
+    NaturalType(NaturalType),
+    IdentityType(IdentityType),
 }
 
 impl Display for TermData {
