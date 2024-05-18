@@ -1,8 +1,4 @@
-use std::{
-    cell::RefCell,
-    fmt::{write, Display},
-    rc::Rc,
-};
+use std::{cell::RefCell, fmt::Display, rc::Rc};
 
 use crate::context::GlobalContext;
 

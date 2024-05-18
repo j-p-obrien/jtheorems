@@ -1,4 +1,4 @@
-use jtheory::judgement::Judgement;
+use jtheorems::judgement::Judgement;
 
 fn main() {
     let genesis = Judgement::empty();
