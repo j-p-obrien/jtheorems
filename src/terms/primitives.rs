@@ -1,8 +1,8 @@
 use std::fmt::Display;
 
-use crate::terms::{Term, TermData};
+use crate::{judgement::Judgement, terms::{Term, TermData}};
 
-use super::{variable::Variable, TermIdx};
+use super::{variable::Variable, TermIdx, Type};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Universe {
@@ -118,6 +118,18 @@ impl Display for Unit {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NaturalType;
+
+impl Into<Type> for NaturalType {
+    fn into(self) -> Type {
+        Type::NaturalType(self)
+    }
+}
+
+impl Into<Judgement> for NaturalType {
+    fn into(self) -> Judgement {
+        Judgement::Type(Type::NaturalType(self))
+    }
+}
 
 impl Display for NaturalType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

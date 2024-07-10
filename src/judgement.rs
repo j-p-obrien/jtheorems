@@ -1,56 +1,53 @@
-use std::{cell::RefCell, fmt::Display, rc::Rc};
-
 use crate::{
-    context::Context,
-    terms::{primitives::NaturalType, Term},
+    context::{Context, ContextTree},
+    terms::{primitives::NaturalType, Term, Type},
 };
 
 pub type Res<T> = Result<T, JError>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum JudgementType {
+pub enum Judgement {
     WellFormed,
     Term(Term),
+    Type(Type),
     Equal(Term, Term),
+    EqualTypes(Type, Type),
 }
 
-impl Display for JudgementType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            JudgementType::WellFormed => write!(f, "ctx"),
-            JudgementType::Term(term) => todo!(),
-            JudgementType::Equal(_, _) => todo!(),
-        }
-    }
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct ContextIdx(usize);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Judgement {
-    context: Context,
-    judgement: JudgementType,
+/// A Judgement is a JudgementType along with its associated Context. ContextIdx points to the
+/// index of the ContextTree that we are currently focusing on i.e. the rightmost variable in a Context.
+pub struct Deduction {
+    context_tree: ContextTree,
+    context_idx: ContextIdx,
+    judgement: Judgement,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum JError {
-    Illegal,
+    Illegal(String),
     NameTaken(String),
 }
 
-impl Display for Judgement {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{}", &self.context, &self.judgement)
+impl ContextIdx {
+    fn new() -> Self {
+        Self(0)
     }
 }
 
-impl Judgement {
-    /// Creates the Empty Context with a WellFormed JudgementType.
+
+impl Deduction {
+    /// Creates the Empty Context with a WellFormed Judgement.
     ///
     /// This is the starting point for all proofs.
     pub fn empty() -> Self {
-        let context = Context::new();
         Self {
-            context,
-            judgement: JudgementType::WellFormed,
+            context_tree: ContextTree::new(),
+            context_idx: ContextIdx::new(),
+            judgement: Judgement::WellFormed,
         }
     }
 
@@ -58,7 +55,14 @@ impl Judgement {
         todo!()
     }
 
-    pub fn natural_formation(&self) -> Res<Self> {
-        todo!()
+    /// Forms the Natural Type
+    pub fn natural_formation(&mut self) -> Res<()> {
+        match self.judgement {
+            Judgement::WellFormed => {
+                self.judgement = NaturalType.into();
+                Ok(())
+            },
+            _ => Err(JError::Illegal("Judgement is not WellFormed".to_string())),
+        }
     }
 }

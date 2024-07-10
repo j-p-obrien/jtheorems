@@ -1,5 +1,5 @@
 use jtheorems::{
-    judgement::Judgement,
+    judgement::Deduction,
     terms::{primitives::NaturalType, variable::VariableData, Term, TermData},
 };
 
@@ -9,7 +9,7 @@ fn main() {
     println!("{}", std::mem::size_of::<VariableData>());
     println!("{}", std::mem::size_of::<TermData>());
 
-    let genesis = Judgement::empty();
+    let genesis = Deduction::empty();
     println!("{}", &genesis);
     let nat_form = genesis.natural_formation().unwrap();
     println!("{}", &nat_form);
