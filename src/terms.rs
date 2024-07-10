@@ -1,7 +1,5 @@
 use std::{cell::RefCell, fmt::Display, rc::Rc};
 
-use crate::context::GlobalContext;
-
 use self::{
     application::{Application, ApplicationData},
     lambda::{Lambda, LambdaData},
@@ -19,7 +17,7 @@ pub mod lambda;
 pub mod primitives;
 pub mod variable;
 
-type Index = u32;
+type TermIdx = u32;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TermData2 {
@@ -89,7 +87,7 @@ pub enum Term2 {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Term {
-    data: Index,
+    data: TermIdx,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

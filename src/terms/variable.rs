@@ -1,18 +1,22 @@
-use crate::context::Context;
-
-use super::{Index, Term, TermData};
+use super::{TermIdx, Term, TermData};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VariableData {
     typ: Term,
-    name: Index,
+    name: TermIdx,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Variable {
+pub(crate) struct FreeVariable {
     /// Points to a VariableData
-    id: Index,
+    id: TermIdx,
 }
+
+pub(crate) struct BoundVariable {
+    /// Points to a VariableData
+    id: TermIdx,
+}
+
 
 impl VariableData {
     pub fn new(name: &str, typ: Term) -> Self {

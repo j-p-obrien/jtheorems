@@ -1,96 +1,49 @@
 use std::{
-    borrow::Borrow,
-    cell::{Ref, RefCell},
     fmt::Display,
-    ops::Index,
-    rc::Rc,
 };
 
 use crate::terms::{
-    variable::{Variable, VariableData},
+    variable::{FreeVariable, VariableData},
     Term, TermData,
 };
 
-pub(crate) const DEFAULT_GLOBAL_CAPACITY: usize = 256;
+type PreviousIdx = usize;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct GlobalContext {
-    terms: Vec<TermData>,
+#[derive(Debug)]
+/// Tree that stores the Context.
+/// 
+/// FreeVariable is a Variable that has been legally introduced into the Context.
+/// PreviousIdx is the index of the previous FreeVariable in the ContextTree. Since the first 
+/// FreeVariablevin a context does not have a predecessor, this value is optional.
+struct ContextTree {
+    tree: Vec<(FreeVariable, Option<PreviousIdx>)>,
 }
 
-impl Index<usize> for GlobalContext {
-    type Output = TermData;
 
-    fn index(&self, index: usize) -> &Self::Output {
-        &self.terms[index]
-    }
-}
-
-impl Index<Variable> for GlobalContext {
-    type Output = TermData;
-
-    fn index(&self, variable: Variable) -> &Self::Output {
-        &self.terms[variable.id() as usize]
-    }
-}
-
-impl Index<Term> for GlobalContext {
-    type Output = TermData;
-
-    fn index(&self, term: Term) -> &Self::Output {
-        &self.terms[term.id() as usize]
-    }
-}
-
-impl GlobalContext {
-    pub(crate) fn new(capacity: usize) -> Self {
-        Self {
-            terms: Vec::with_capacity(capacity),
-        }
-    }
-
-    pub(crate) fn next_id(&self) -> usize {
-        (*self.terms).borrow().len()
-    }
-
-    pub(crate) fn push(&mut self, term_data: TermData) {
-        self.terms.push(term_data)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug)]
+/// The Context
+/// 
+/// Contains the ContextTree and the associated data for each FreeVariable in the Context Tree
 pub(crate) struct Context {
-    global_context: Rc<RefCell<GlobalContext>>,
-    variables: Vec<Variable>,
+    tree: ContextTree,
+    variables: Vec<VariableData>,
 }
 
-impl Display for Context {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.variables.is_empty() {
-            write!(f, "⋅")
-        } else {
-            for var in &self.variables {
-                let term_data = &(*self.global_context).borrow()[var.id() as usize];
-                match term_data {
-                    TermData::Variable(var_data) => todo!(),
-                    _ => unreachable!("Variables in a Context should always point to VariableData"),
-                }
-            }
-            Ok(())
+impl ContextTree {
+    fn new() -> Self {
+        Self {
+            tree: vec![]
         }
     }
 }
+
 
 impl Context {
     pub(crate) fn new() -> Self {
-        let global_context = Rc::new(RefCell::new(GlobalContext::new(DEFAULT_GLOBAL_CAPACITY)));
-        Self {
-            global_context,
-            variables: vec![],
-        }
+        Self { tree: ContextTree::new(), variables: vec![] }
     }
 
-    pub(crate) fn push(&mut self, variable: Variable) {
+    pub(crate) fn push(&mut self, variable: FreeVariable) {
         todo!()
     }
 

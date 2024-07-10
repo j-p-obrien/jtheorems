@@ -1,4 +1,4 @@
-use super::{primitives::PiType, variable::Variable, Index, Term};
+use super::{primitives::PiType, variable::Variable, TermIdx, Term};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LambdaData {
@@ -10,5 +10,5 @@ pub struct LambdaData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Lambda {
     /// Points to a LambdaData
-    id: Index,
+    id: TermIdx,
 }

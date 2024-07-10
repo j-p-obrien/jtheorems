@@ -2,11 +2,11 @@ use std::fmt::Display;
 
 use crate::terms::{Term, TermData};
 
-use super::{variable::Variable, Index};
+use super::{variable::Variable, TermIdx};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Universe {
-    level: Index,
+    level: TermIdx,
 }
 
 impl Display for Universe {
@@ -34,7 +34,7 @@ pub struct PiTypeData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PiType {
     /// Points to a PiTypeData
-    id: Index,
+    id: TermIdx,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -48,7 +48,7 @@ pub struct SigmaTypeData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SigmaType {
     /// Points to a SigmaTypeData
-    id: Index,
+    id: TermIdx,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -61,7 +61,7 @@ pub struct PairData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Pair {
     /// Points to a PairData
-    id: Index,
+    id: TermIdx,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -74,7 +74,7 @@ pub struct CoproductTypeData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CoproductType {
     /// Points to a CoproductTypeData
-    id: Index,
+    id: TermIdx,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -86,7 +86,7 @@ pub struct LeftData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Left {
     /// Points to a LeftData
-    id: Index,
+    id: TermIdx,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -98,7 +98,7 @@ pub struct RightData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Right {
     /// Points to a RightData
-    id: Index,
+    id: TermIdx,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -147,7 +147,7 @@ pub struct IdentityTypeData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IdentityType {
     /// Points to an IdentityTypeData
-    id: Index,
+    id: TermIdx,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -159,7 +159,7 @@ pub struct ReflData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Refl {
     /// Points to a ReflData
-    id: Index,
+    id: TermIdx,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

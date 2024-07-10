@@ -1,6 +1,6 @@
 use crate::terms::Term;
 
-use super::Index;
+use super::TermIdx;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ApplicationData {
@@ -12,7 +12,7 @@ pub struct ApplicationData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Application {
     /// Points to an ApplicationData
-    id: Index,
+    id: TermIdx,
 }
 
 impl Application {

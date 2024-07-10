@@ -1,7 +1,7 @@
 use std::{cell::RefCell, fmt::Display, rc::Rc};
 
 use crate::{
-    context::{Context, GlobalContext, DEFAULT_GLOBAL_CAPACITY},
+    context::Context,
     terms::{primitives::NaturalType, Term},
 };
 
