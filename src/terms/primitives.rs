@@ -2,11 +2,11 @@ use std::fmt::Display;
 
 use crate::terms::{Term, TermData};
 
-use super::variable::Variable;
+use super::{variable::Variable, Index};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Universe {
-    level: usize,
+    level: Index,
 }
 
 impl Display for Universe {
@@ -15,30 +15,40 @@ impl Display for Universe {
     }
 }
 
+impl Universe {
+    pub(crate) fn typ(&self) -> Self {
+        Self {
+            level: self.level + 1,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PiTypeData {
     variable: Variable,
     output_typ: Term,
+    //dependent: bool,
     universe: Universe,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PiType {
     /// Points to a PiTypeData
-    id: usize,
+    id: Index,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SigmaTypeData {
     variable: Variable,
     output_typ: Term,
+    dependent: bool,
     universe: Universe,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SigmaType {
     /// Points to a SigmaTypeData
-    id: usize,
+    id: Index,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -51,7 +61,7 @@ pub struct PairData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Pair {
     /// Points to a PairData
-    id: usize,
+    id: Index,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -64,7 +74,7 @@ pub struct CoproductTypeData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CoproductType {
     /// Points to a CoproductTypeData
-    id: usize,
+    id: Index,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -76,7 +86,7 @@ pub struct LeftData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Left {
     /// Points to a LeftData
-    id: usize,
+    id: Index,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -88,7 +98,7 @@ pub struct RightData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Right {
     /// Points to a RightData
-    id: usize,
+    id: Index,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -99,6 +109,12 @@ pub struct UnitType;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Unit();
+
+impl Display for Unit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "⋆")
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NaturalType;
@@ -118,16 +134,8 @@ impl NaturalType {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Zero();
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SuccData {
-    input: Term,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Succ {
-    /// Points to a SuccData
-    id: usize,
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Succ();
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IdentityTypeData {
@@ -139,7 +147,7 @@ pub struct IdentityTypeData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IdentityType {
     /// Points to an IdentityTypeData
-    id: usize,
+    id: Index,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -151,7 +159,7 @@ pub struct ReflData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Refl {
     /// Points to a ReflData
-    id: usize,
+    id: Index,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -168,7 +176,7 @@ pub enum PrimitiveData {
     //Unit(Unit),
     //NaturalNumbers(NaturalType),
     //Zero(Zero),
-    Succ(SuccData),
+    //Succ(Succ),
     IdentityType(IdentityTypeData),
     Refl(ReflData),
 }

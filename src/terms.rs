@@ -8,7 +8,7 @@ use self::{
     primitives::{
         CoproductType, CoproductTypeData, EmptyType, IdentityType, IdentityTypeData, Left,
         LeftData, NaturalType, Pair, PairData, PiType, PiTypeData, Refl, ReflData, Right,
-        RightData, SigmaType, SigmaTypeData, Succ, SuccData, Unit, UnitType, Universe, Zero,
+        RightData, SigmaType, SigmaTypeData, Succ, Unit, UnitType, Universe, Zero,
     },
     variable::{Variable, VariableData},
 };
@@ -19,8 +19,10 @@ pub mod lambda;
 pub mod primitives;
 pub mod variable;
 
+type Index = u32;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum TermData {
+pub enum TermData2 {
     Variable(VariableData),
     Lambda(LambdaData),
     Application(ApplicationData),
@@ -36,13 +38,35 @@ pub enum TermData {
     //Unit(Unit),
     //NaturalType(NaturalType),
     //Zero(Zero),
-    Succ(SuccData),
+    //Succ(Succ),
     IdentityType(IdentityTypeData),
     Refl(ReflData),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Term {
+pub enum TermData {
+    Variable(VariableData),
+    Lambda(LambdaData),
+    Application(ApplicationData),
+    Universe(Universe),
+    PiType(PiTypeData),
+    SigmaType(SigmaTypeData),
+    Pair(PairData),
+    CoproductType(CoproductTypeData),
+    Left(LeftData),
+    Right(RightData),
+    EmptyType(EmptyType),
+    UnitType(UnitType),
+    Unit(Unit),
+    NaturalType(NaturalType),
+    Zero(Zero),
+    Succ(Succ),
+    IdentityType(IdentityTypeData),
+    Refl(ReflData),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Term2 {
     Variable(Variable),
     Lambda(Lambda),
     Application(Application),
@@ -64,6 +88,11 @@ pub enum Term {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Term {
+    data: Index,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Type {
     Variable(Variable),
     PiType(PiType),
@@ -82,6 +111,10 @@ impl Display for TermData {
 }
 
 impl Term {
+    pub(crate) fn new() -> Self {
+        todo!()
+    }
+
     pub(crate) fn is_type(&self) -> bool {
         todo!()
     }
@@ -90,7 +123,7 @@ impl Term {
         todo!()
     }
 
-    pub(crate) fn typ(&self) -> Term {
+    pub(crate) fn typ(&self) -> &Term {
         todo!()
     }
 
@@ -98,7 +131,11 @@ impl Term {
         todo!()
     }
 
-    pub(crate) fn data(&self, global_context: Rc<RefCell<GlobalContext>>) -> TermData {
+    pub(crate) fn data(&self, global_context: GlobalContext) -> TermData {
+        todo!()
+    }
+
+    pub(crate) fn id(&self) -> usize {
         todo!()
     }
 }

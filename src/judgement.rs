@@ -1,7 +1,7 @@
 use std::{cell::RefCell, fmt::Display, rc::Rc};
 
 use crate::{
-    context::{Context, GlobalContext, GLOBAL_CONTEXT_CAPACITY},
+    context::{Context, GlobalContext, DEFAULT_GLOBAL_CAPACITY},
     terms::{primitives::NaturalType, Term},
 };
 
@@ -47,8 +47,7 @@ impl Judgement {
     ///
     /// This is the starting point for all proofs.
     pub fn empty() -> Self {
-        let global_context = GlobalContext::new(GLOBAL_CONTEXT_CAPACITY);
-        let context = Context::new(Rc::new(RefCell::new(global_context)));
+        let context = Context::new();
         Self {
             context,
             judgement: JudgementType::WellFormed,
@@ -60,15 +59,6 @@ impl Judgement {
     }
 
     pub fn natural_formation(&self) -> Res<Self> {
-        match self.judgement {
-            JudgementType::WellFormed => {
-                let new_context = self.context.clone();
-                Ok(Self {
-                    context: new_context,
-                    judgement: JudgementType::Term(Term::NaturalType(NaturalType)),
-                })
-            }
-            _ => Err(JError::Illegal),
-        }
+        todo!()
     }
 }

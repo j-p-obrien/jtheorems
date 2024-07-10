@@ -1,22 +1,25 @@
 use crate::context::Context;
 
-use super::{Term, TermData};
+use super::{Index, Term, TermData};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VariableData {
-    name: String,
     typ: Term,
+    name: Index,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Variable {
     /// Points to a VariableData
-    id: usize,
+    id: Index,
 }
 
 impl VariableData {
-    pub(crate) fn new(name: String, typ: Term) -> Self {
-        Self { name, typ }
+    pub fn new(name: &str, typ: Term) -> Self {
+        Self {
+            name: name.to_owned(),
+            typ,
+        }
     }
 
     pub(crate) fn is_type(&self) -> bool {
@@ -38,6 +41,6 @@ impl VariableData {
 
 impl Variable {
     pub(crate) fn id(&self) -> usize {
-        self.id
+        self.id as usize
     }
 }

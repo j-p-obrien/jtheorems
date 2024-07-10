@@ -11,34 +11,50 @@ use crate::terms::{
     Term, TermData,
 };
 
-pub(crate) const GLOBAL_CONTEXT_CAPACITY: usize = 512;
+pub(crate) const DEFAULT_GLOBAL_CAPACITY: usize = 256;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct GlobalContext {
     terms: Vec<TermData>,
 }
 
+impl Index<usize> for GlobalContext {
+    type Output = TermData;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.terms[index]
+    }
+}
+
+impl Index<Variable> for GlobalContext {
+    type Output = TermData;
+
+    fn index(&self, variable: Variable) -> &Self::Output {
+        &self.terms[variable.id() as usize]
+    }
+}
+
+impl Index<Term> for GlobalContext {
+    type Output = TermData;
+
+    fn index(&self, term: Term) -> &Self::Output {
+        &self.terms[term.id() as usize]
+    }
+}
+
 impl GlobalContext {
-    pub fn new(capacity: usize) -> Self {
+    pub(crate) fn new(capacity: usize) -> Self {
         Self {
             terms: Vec::with_capacity(capacity),
         }
     }
 
     pub(crate) fn next_id(&self) -> usize {
-        self.terms.len()
+        (*self.terms).borrow().len()
     }
 
     pub(crate) fn push(&mut self, term_data: TermData) {
         self.terms.push(term_data)
-    }
-}
-
-impl Index<usize> for GlobalContext {
-    type Output = TermData;
-
-    fn index<'a>(&'a self, index: usize) -> &'a Self::Output {
-        &self.terms[index]
     }
 }
 
@@ -54,7 +70,7 @@ impl Display for Context {
             write!(f, "⋅")
         } else {
             for var in &self.variables {
-                let term_data = &(*self.global_context).borrow()[var.id()];
+                let term_data = &(*self.global_context).borrow()[var.id() as usize];
                 match term_data {
                     TermData::Variable(var_data) => todo!(),
                     _ => unreachable!("Variables in a Context should always point to VariableData"),
@@ -66,10 +82,11 @@ impl Display for Context {
 }
 
 impl Context {
-    pub(crate) fn new(global_context: Rc<RefCell<GlobalContext>>) -> Self {
+    pub(crate) fn new() -> Self {
+        let global_context = Rc::new(RefCell::new(GlobalContext::new(DEFAULT_GLOBAL_CAPACITY)));
         Self {
-            variables: vec![],
             global_context,
+            variables: vec![],
         }
     }
 
@@ -77,7 +94,7 @@ impl Context {
         todo!()
     }
 
-    fn name_is_taken(&self, name: &str) -> bool {
+    pub(crate) fn name_is_taken(&self, name: &str) -> bool {
         todo!()
     }
 }
