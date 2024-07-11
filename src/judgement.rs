@@ -1,4 +1,4 @@
-use std::hint::unreachable_unchecked;
+use std::{fmt::Display, hint::unreachable_unchecked, time::Duration};
 
 use crate::{
     context::ContextTree,
@@ -56,6 +56,12 @@ impl Judgement {
     #[inline]
     fn replace(&mut self, judgement: Self) -> Self {
         std::mem::replace(self, judgement)
+    }
+}
+
+impl Display for Deduction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        todo!()
     }
 }
 

@@ -1,12 +1,16 @@
 use jtheorems::{
     judgement::Deduction,
+    parser::parser::Parser,
     terms::{variable::VariableData, Term, TermData},
 };
 
 fn main() {
-    let deduction = Deduction::new();
+    let mut deduction = Deduction::new();
+    let parser = Parser::new();
     loop {
-        let mut input = String::new();
-        std::io::stdin().read_line(&mut input).unwrap();
+        println!("{}", &deduction);
+        let mut raw_input = String::new();
+        std::io::stdin().read_line(&mut raw_input).unwrap();
+        let parsed_input = parser.parse(&raw_input);
     }
 }
