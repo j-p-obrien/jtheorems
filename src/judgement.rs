@@ -3,7 +3,7 @@ use std::hint::unreachable_unchecked;
 use crate::{
     context::ContextTree,
     terms::{
-        primitives::{NaturalType, Universe},
+        primitives::{NaturalType, Universe, UniverseLevel},
         variable::VariableData,
         Term, TermIdx, Type,
     },
@@ -68,20 +68,19 @@ impl Deduction {
         }
     }
 
-    /// If the Judgement is a Type, we can introduce a Variable with the given name.
+    /// If the Judgement is a Type and the given name is not taken, we can introduce a FreeVariable
+    /// with that name.
     ///
-    /// If the Judgement is any other kind, we return an error.
+    /// If the Judgement is any other variant, or the name is taken we return an error.
     pub fn variable_introduction(&mut self, name: String) -> JResult {
         // This looks weird because we do not have ownership over the Judgement.
         match &self.judgement {
-            Judgement::Type(_) => {
-                if !self.context_tree.contains_name_at(&name, self.context_ptr) {
-                    let Judgement::Type(typ) = self.judgement.replace_with_wellformed() else {
-                        // SAFETY: We just checked that the variant was Type above.
-                        unsafe { unreachable_unchecked() }
-                    };
-                }
-
+            Judgement::Type(_) if !self.context_tree.contains_name_at(&name, self.context_ptr) => {
+                let Judgement::Type(typ) = self.judgement.replace_with_wellformed() else {
+                    // SAFETY: We just checked that the variant was Type above.
+                    unsafe { unreachable_unchecked() }
+                };
+                let variable = VariableData::new(name, typ);
                 todo!()
             }
             _ => Err(JError::Illegal(
@@ -105,9 +104,9 @@ impl Deduction {
         }
     }
 
-    pub fn universe_formation(&mut self, level: TermIdx) -> JResult {
+    pub fn universe_formation(&mut self, level: UniverseLevel) -> JResult {
         if let Judgement::WellFormed = self.judgement {
-            self.judgement = Judgement::Type(Type::Universe(Universe::new(level)));
+            self.judgement = Universe::new(level).into();
             Ok(())
         } else {
             Err(JError::Illegal(

@@ -12,18 +12,15 @@ pub(crate) struct FreeVariable {
     id: TermIdx,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct BoundVariable {
     /// Points to a VariableData
     id: TermIdx,
 }
 
-
 impl VariableData {
     pub fn new(name: String, typ: Type) -> Self {
-        Self {
-            name,
-            typ,
-        }
+        Self { name, typ }
     }
 
     pub(crate) fn is_type(&self) -> bool {
@@ -42,4 +39,3 @@ impl VariableData {
         &self.name
     }
 }
-
