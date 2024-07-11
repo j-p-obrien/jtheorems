@@ -1,8 +1,4 @@
-use jtheorems::{
-    judgement::Deduction,
-    parser::parser::Parser,
-    terms::{variable::VariableData, Term, TermData},
-};
+use jtheorems::{judgement::Deduction, parser::parser::Parser};
 
 fn main() {
     let mut deduction = Deduction::new();

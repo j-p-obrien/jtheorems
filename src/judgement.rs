@@ -124,3 +124,39 @@ impl Deduction {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_variable_introduction() {
+        let mut deduction = Deduction::new();
+        let _ = deduction.universe_formation(0);
+        assert_eq!(deduction.variable_introduction("x".to_string()), Ok(()));
+        assert_eq!(
+            deduction.variable_introduction("x".to_string()),
+            Err(JError::NameTaken("x".to_string()))
+        );
+    }
+
+    #[test]
+    fn test_natural_formation() {
+        let mut deduction = Deduction::new();
+        assert_eq!(deduction.natural_formation(), Ok(()));
+        assert_eq!(
+            deduction.judgement,
+            Judgement::Type(Type::NaturalType(NaturalType))
+        );
+    }
+
+    #[test]
+    fn test_universe_formation() {
+        let mut deduction = Deduction::new();
+        assert_eq!(deduction.universe_formation(0), Ok(()));
+        assert_eq!(
+            deduction.judgement,
+            Judgement::Type(Type::Universe(Universe::new(0)))
+        );
+    }
+}
