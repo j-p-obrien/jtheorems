@@ -1,5 +1,5 @@
 use crate::{
-    judgement::ContextPtr,
+    deduction::judgement::ContextPtr,
     terms::variable::{FreeVariable, VariableData},
 };
 
@@ -25,6 +25,10 @@ impl ContextTree {
     }
 
     pub(crate) fn contains_name_at(&self, name: &str, location: ContextPtr) -> bool {
+        todo!()
+    }
+
+    pub(crate) fn push_variable(&mut self, variable_data: VariableData) -> FreeVariable {
         todo!()
     }
 }

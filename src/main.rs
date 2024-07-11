@@ -1,4 +1,4 @@
-use jtheorems::{judgement::Deduction, parser::parser::Parser};
+use jtheorems::{deduction::judgement::Deduction, parser::parser::Parser};
 
 fn main() {
     let mut deduction = Deduction::new();

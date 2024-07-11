@@ -1,4 +1,3 @@
-pub mod context;
-pub mod judgement;
+pub mod deduction;
 pub mod parser;
 pub mod terms;

@@ -1,7 +1,7 @@
 use std::{fmt::Display, hint::unreachable_unchecked, time::Duration};
 
 use crate::{
-    context::ContextTree,
+    deduction::context::ContextTree,
     terms::{
         primitives::{
             naturals::NaturalType,
@@ -89,7 +89,8 @@ impl Deduction {
                     // SAFETY: We just checked that the variant was Type above.
                     unsafe { unreachable_unchecked() }
                 };
-                let variable = VariableData::new(name, typ);
+                let variable_data = VariableData::new(name, typ);
+                let free_variable = self.context_tree.push_variable(variable_data);
                 todo!()
             }
             _ => Err(JError::Illegal(
