@@ -1,30 +1,21 @@
-use lambda::{PiType, PiTypeData};
-use primitives::{
-    coproduct::{CoproductType, Left, Right, RightData},
-    identity::{IdentityType, Refl, ReflData},
-    naturals::{Succ, Zero},
-    pair::{Pair, SigmaType, SigmaTypeData},
-    unit::{Unit, UnitType},
-    universe::Universe,
-};
-
-use self::{
-    application::{Application, ApplicationData},
-    lambda::{Lambda, LambdaData},
-    primitives::coproduct::CoproductTypeData,
-    primitives::coproduct::LeftData,
-    primitives::empty::EmptyType,
-    primitives::identity::IdentityTypeData,
-    primitives::naturals::NaturalType,
-    primitives::pair::PairData,
-    variable::{FreeVariable, VariableData},
-};
-
 pub mod application;
 pub mod defined;
 pub mod lambda;
 pub mod primitives;
 pub mod variable;
+
+use application::{Application, ApplicationData};
+use lambda::{Lambda, LambdaData, PiType, PiTypeData};
+use primitives::{
+    coproduct::{CoproductType, CoproductTypeData, Left, LeftData, Right, RightData},
+    empty::EmptyType,
+    identity::{IdentityType, IdentityTypeData, Refl, ReflData},
+    naturals::{NaturalType, Succ, Zero},
+    pair::{Pair, PairData, SigmaType, SigmaTypeData},
+    unit::{Unit, UnitType},
+    universe::Universe,
+};
+use variable::{FreeVariable, VariableData};
 
 pub(crate) type TermIdx = u32;
 

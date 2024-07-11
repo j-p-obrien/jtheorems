@@ -1,16 +1,12 @@
 use jtheorems::{
     judgement::Deduction,
-    terms::{primitives::NaturalType, variable::VariableData, Term, TermData},
+    terms::{variable::VariableData, Term, TermData},
 };
 
 fn main() {
-    //let vardata = VariableData::new("x", Term::new());
-    println!("{}", std::mem::size_of::<Box<str>>());
-    println!("{}", std::mem::size_of::<VariableData>());
-    println!("{}", std::mem::size_of::<TermData>());
-
-    let genesis = Deduction::empty();
-    println!("{}", &genesis);
-    let nat_form = genesis.natural_formation().unwrap();
-    println!("{}", &nat_form);
+    let deduction = Deduction::new();
+    loop {
+        let mut input = String::new();
+        std::io::stdin().read_line(&mut input).unwrap();
+    }
 }

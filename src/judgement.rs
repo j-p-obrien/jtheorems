@@ -3,9 +3,12 @@ use std::hint::unreachable_unchecked;
 use crate::{
     context::ContextTree,
     terms::{
-        primitives::{NaturalType, Universe, UniverseLevel},
+        primitives::{
+            naturals::NaturalType,
+            universe::{Universe, UniverseLevel},
+        },
         variable::VariableData,
-        Term, TermIdx, Type,
+        Term, Type,
     },
 };
 
@@ -60,7 +63,7 @@ impl Deduction {
     /// Creates the Empty Context with a WellFormed Judgement.
     ///
     /// This is the starting point for all proofs.
-    pub fn empty() -> Self {
+    pub fn new() -> Self {
         Self {
             context_tree: ContextTree::new(),
             context_ptr: ContextPtr::new(),
