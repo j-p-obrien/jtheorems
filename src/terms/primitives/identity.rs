@@ -1,4 +1,4 @@
-use crate::terms::{Term, TermIdx};
+use crate::terms::{Term, TermPtr};
 
 use super::universe::Universe;
 
@@ -12,7 +12,7 @@ pub struct IdentityTypeData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IdentityType {
     /// Points to an IdentityTypeData
-    id: TermIdx,
+    id: TermPtr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -24,5 +24,5 @@ pub struct ReflData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Refl {
     /// Points to a ReflData
-    id: TermIdx,
+    id: TermPtr,
 }

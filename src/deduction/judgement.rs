@@ -1,4 +1,4 @@
-use std::{fmt::Display, hint::unreachable_unchecked, time::Duration};
+use std::{fmt::Display, hint::unreachable_unchecked};
 
 use crate::{
     deduction::context::ContextTree,
@@ -15,7 +15,7 @@ use crate::{
 pub type JResult = Result<(), JError>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Judgement {
+pub enum JudgementKind {
     WellFormed,
     Term(Term),
     Type(Type),
@@ -27,11 +27,16 @@ pub enum Judgement {
 pub(crate) struct ContextPtr(usize);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct Judgement {
+    kind: JudgementKind,
+    context_ptr: ContextPtr,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 /// A Judgement is a JudgementType along with its associated Context. ContextIdx points to the
 /// index of the ContextTree that we are currently focusing on i.e. the rightmost variable in a Context.
 pub struct Deduction {
     context_tree: ContextTree,
-    context_ptr: ContextPtr,
     judgement: Judgement,
 }
 
@@ -47,7 +52,7 @@ impl ContextPtr {
     }
 }
 
-impl Judgement {
+impl JudgementKind {
     #[inline]
     fn replace_with_wellformed(&mut self) -> Self {
         self.replace(Self::WellFormed)
@@ -56,6 +61,15 @@ impl Judgement {
     #[inline]
     fn replace(&mut self, judgement: Self) -> Self {
         std::mem::replace(self, judgement)
+    }
+}
+
+impl Judgement {
+    pub(crate) fn new() -> Self {
+        Self {
+            kind: JudgementKind::WellFormed,
+            context_ptr: ContextPtr::new(),
+        }
     }
 }
 
@@ -72,8 +86,7 @@ impl Deduction {
     pub fn new() -> Self {
         Self {
             context_tree: ContextTree::new(),
-            context_ptr: ContextPtr::new(),
-            judgement: Judgement::WellFormed,
+            judgement: Judgement::new(),
         }
     }
 
@@ -84,8 +97,10 @@ impl Deduction {
     pub fn variable_introduction(&mut self, name: String) -> JResult {
         // This looks weird because we do not have ownership over the Judgement.
         match &self.judgement {
-            Judgement::Type(_) if !self.context_tree.contains_name_at(&name, self.context_ptr) => {
-                let Judgement::Type(typ) = self.judgement.replace_with_wellformed() else {
+            JudgementKind::Type(_)
+                if !self.context_tree.contains_name_at(&name, self.context_ptr) =>
+            {
+                let JudgementKind::Type(typ) = self.judgement.replace_with_wellformed() else {
                     // SAFETY: We just checked that the variant was Type above.
                     unsafe { unreachable_unchecked() }
                 };
@@ -104,7 +119,7 @@ impl Deduction {
     /// This can be done in any WellFormed context.
     pub fn natural_formation(&mut self) -> JResult {
         match self.judgement {
-            Judgement::WellFormed => {
+            JudgementKind::WellFormed => {
                 self.judgement = NaturalType.into();
                 Ok(())
             }
@@ -115,7 +130,7 @@ impl Deduction {
     }
 
     pub fn universe_formation(&mut self, level: UniverseLevel) -> JResult {
-        if let Judgement::WellFormed = self.judgement {
+        if let JudgementKind::WellFormed = self.judgement {
             self.judgement = Universe::new(level).into();
             Ok(())
         } else {
@@ -147,7 +162,7 @@ mod tests {
         assert_eq!(deduction.natural_formation(), Ok(()));
         assert_eq!(
             deduction.judgement,
-            Judgement::Type(Type::NaturalType(NaturalType))
+            JudgementKind::Type(Type::NaturalType(NaturalType))
         );
     }
 
@@ -157,7 +172,7 @@ mod tests {
         assert_eq!(deduction.universe_formation(0), Ok(()));
         assert_eq!(
             deduction.judgement,
-            Judgement::Type(Type::Universe(Universe::new(0)))
+            JudgementKind::Type(Type::Universe(Universe::new(0)))
         );
     }
 }

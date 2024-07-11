@@ -1,4 +1,4 @@
-use super::super::{Term, TermIdx, Type};
+use super::super::{Term, TermPtr, Type};
 use super::universe::Universe;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -11,7 +11,7 @@ pub struct CoproductTypeData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CoproductType {
     /// Points to a CoproductTypeData
-    id: TermIdx,
+    id: TermPtr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -23,7 +23,7 @@ pub struct LeftData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Left {
     /// Points to a LeftData
-    id: TermIdx,
+    id: TermPtr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -35,5 +35,5 @@ pub struct RightData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Right {
     /// Points to a RightData
-    id: TermIdx,
+    id: TermPtr,
 }

@@ -1,4 +1,4 @@
-use super::super::{variable::BoundVariable, Term, TermIdx};
+use super::super::{variable::BoundVariable, Term, TermPtr};
 
 use super::universe::Universe;
 
@@ -13,7 +13,7 @@ pub struct SigmaTypeData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SigmaType {
     /// Points to a SigmaTypeData
-    id: TermIdx,
+    id: TermPtr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -26,5 +26,5 @@ pub struct PairData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Pair {
     /// Points to a PairData
-    id: TermIdx,
+    id: TermPtr,
 }

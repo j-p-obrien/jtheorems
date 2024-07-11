@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::{deduction::judgement::Judgement, terms::Type};
+use crate::{deduction::judgement::JudgementKind, terms::Type};
 
 use super::universe::Universe;
 
@@ -13,9 +13,9 @@ impl Into<Type> for NaturalType {
     }
 }
 
-impl Into<Judgement> for NaturalType {
-    fn into(self) -> Judgement {
-        Judgement::Type(Type::NaturalType(self))
+impl Into<JudgementKind> for NaturalType {
+    fn into(self) -> JudgementKind {
+        JudgementKind::Type(Type::NaturalType(self))
     }
 }
 

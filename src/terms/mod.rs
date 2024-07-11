@@ -5,6 +5,7 @@ pub mod primitives;
 pub mod variable;
 
 use application::{Application, ApplicationData};
+use defined::{Defined, DefinedData};
 use lambda::{Lambda, LambdaData, PiType, PiTypeData};
 use primitives::{
     coproduct::{CoproductType, CoproductTypeData, Left, LeftData, Right, RightData},
@@ -17,13 +18,14 @@ use primitives::{
 };
 use variable::{FreeVariable, VariableData};
 
-pub(crate) type TermIdx = u32;
+pub(crate) type TermPtr = u32;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TermData2 {
     Variable(VariableData),
     Lambda(LambdaData),
     Application(ApplicationData),
+    Defined(DefinedData),
     //Universe(Universe),
     PiType(PiTypeData),
     SigmaType(SigmaTypeData),
@@ -46,6 +48,7 @@ pub enum TermData {
     Variable(VariableData),
     Lambda(LambdaData),
     Application(ApplicationData),
+    Defined(DefinedData),
     Universe(Universe),
     PiType(PiTypeData),
     SigmaType(SigmaTypeData),
@@ -68,6 +71,7 @@ pub enum Term2 {
     Variable(FreeVariable),
     Lambda(Lambda),
     Application(Application),
+    Defined(Defined),
     Universe(Universe),
     PiType(PiType),
     SigmaType(SigmaType),
@@ -87,13 +91,14 @@ pub enum Term2 {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Term {
-    data: TermIdx,
+    data: TermPtr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Type {
-    Universe(Universe),
     Variable(FreeVariable),
+    Defined(Defined),
+    Universe(Universe),
     PiType(PiType),
     SigmaType(SigmaType),
     CoproductType(CoproductType),

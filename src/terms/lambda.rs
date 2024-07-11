@@ -1,4 +1,4 @@
-use super::{primitives::universe::Universe, variable::BoundVariable, Term, TermIdx};
+use super::{primitives::universe::Universe, variable::BoundVariable, Term, TermPtr};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PiTypeData {
@@ -11,7 +11,7 @@ pub struct PiTypeData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PiType {
     /// Points to a PiTypeData
-    id: TermIdx,
+    id: TermPtr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -24,5 +24,5 @@ pub struct LambdaData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Lambda {
     /// Points to a LambdaData
-    id: TermIdx,
+    id: TermPtr,
 }

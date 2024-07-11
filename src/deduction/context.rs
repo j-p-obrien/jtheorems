@@ -3,12 +3,12 @@ use crate::{
     terms::variable::{FreeVariable, VariableData},
 };
 
-type ParentIdx = usize;
+type ParentPtr = usize;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct ContextTreeNode {
     free_variable: FreeVariable,
-    parent: ParentIdx,
+    parent: ParentPtr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

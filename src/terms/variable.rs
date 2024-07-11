@@ -1,4 +1,4 @@
-use super::{Term, TermData, TermIdx, Type};
+use super::{Term, TermData, TermPtr, Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VariableData {
@@ -9,13 +9,13 @@ pub struct VariableData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct FreeVariable {
     /// Points to a VariableData
-    id: TermIdx,
+    id: TermPtr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct BoundVariable {
     /// Points to a VariableData
-    id: TermIdx,
+    id: TermPtr,
 }
 
 impl VariableData {
