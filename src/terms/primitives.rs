@@ -2,11 +2,20 @@ use std::fmt::Display;
 
 use crate::{judgement::Judgement, terms::{Term, TermData}};
 
-use super::{variable::Variable, TermIdx, Type};
+use super::{variable::BoundVariable, TermIdx, Type};
+
+const UNIT: &str = "⋆";
+
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Universe {
     level: TermIdx,
+}
+
+impl Universe {
+    pub(crate) fn new(level: TermIdx) -> Self {
+        Self { level }
+    }
 }
 
 impl Display for Universe {

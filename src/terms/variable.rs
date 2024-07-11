@@ -1,9 +1,9 @@
-use super::{TermIdx, Term, TermData};
+use super::{Term, TermData, TermIdx, Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VariableData {
-    typ: Term,
-    name: TermIdx,
+    name: String,
+    typ: Type,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -19,19 +19,19 @@ pub(crate) struct BoundVariable {
 
 
 impl VariableData {
-    pub fn new(name: &str, typ: Term) -> Self {
+    pub fn new(name: String, typ: Type) -> Self {
         Self {
-            name: name.to_owned(),
+            name,
             typ,
         }
     }
 
     pub(crate) fn is_type(&self) -> bool {
-        self.typ.is_universe()
+        todo!()
     }
 
-    pub(crate) fn typ(&self) -> &Term {
-        &self.typ
+    pub(crate) fn typ(&self) -> &Type {
+        todo!()
     }
 
     pub(crate) fn has_name(&self, name: &str) -> bool {
@@ -43,8 +43,3 @@ impl VariableData {
     }
 }
 
-impl Variable {
-    pub(crate) fn id(&self) -> usize {
-        self.id as usize
-    }
-}

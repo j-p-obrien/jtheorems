@@ -17,7 +17,7 @@ pub mod lambda;
 pub mod primitives;
 pub mod variable;
 
-type TermIdx = u32;
+pub(crate) type TermIdx = u32;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TermData2 {
@@ -92,6 +92,7 @@ pub struct Term {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Type {
+    Universe(Universe),
     Variable(Variable),
     PiType(PiType),
     SigmaType(SigmaType),

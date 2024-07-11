@@ -1,9 +1,11 @@
 use crate::{
-    context::{Context, ContextTree},
-    terms::{primitives::NaturalType, Term, Type},
+    context::ContextTree,
+    terms::{
+        primitives::{NaturalType, Universe}, variable::VariableData, Term, TermIdx, Type
+    },
 };
 
-pub type Res<T> = Result<T, JError>;
+pub type JResult = Result<(), JError>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Judgement {
@@ -38,7 +40,6 @@ impl ContextIdx {
     }
 }
 
-
 impl Deduction {
     /// Creates the Empty Context with a WellFormed Judgement.
     ///
@@ -51,18 +52,40 @@ impl Deduction {
         }
     }
 
-    pub fn extend_context(&self, name: String) -> Res<Self> {
-        todo!()
+    pub fn variable_introduction(&mut self, name: String) -> JResult {
+        if let Judgement::Type(typ) = &mut self.judgement {
+            todo!()
+        } else {
+            Err(JError::Illegal(
+                "Judgement must be a Type to introduce a Variable.".to_string(),
+            ))
+        }
     }
 
-    /// Forms the Natural Type
-    pub fn natural_formation(&mut self) -> Res<()> {
+    /// Forms the Natural Type.
+    ///
+    /// This can be done in any WellFormed context.
+    pub fn natural_formation(&mut self) -> JResult {
         match self.judgement {
             Judgement::WellFormed => {
                 self.judgement = NaturalType.into();
                 Ok(())
-            },
-            _ => Err(JError::Illegal("Judgement is not WellFormed".to_string())),
+            }
+            _ => Err(JError::Illegal(
+                "Judgement must be WellFormed to introduce a Type.".to_string(),
+            )),
+        }
+    }
+
+
+    pub fn universe_formation(&mut self, level: TermIdx) -> JResult {
+        if let Judgement::WellFormed = self.judgement {
+            self.judgement = Judgement::Type(Type::Universe(Universe::new(level)));
+            Ok(())
+        } else {
+            Err(JError::Illegal(
+                "Judgement must be WellFormed to introduce a Universe.".to_string(),
+            ))
         }
     }
 }
