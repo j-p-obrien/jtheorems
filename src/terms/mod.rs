@@ -1,14 +1,23 @@
-use std::{cell::RefCell, fmt::Display, rc::Rc};
+use lambda::{PiType, PiTypeData};
+use primitives::{
+    coproduct::{CoproductType, Left, Right, RightData},
+    identity::{IdentityType, Refl, ReflData},
+    naturals::{Succ, Zero},
+    pair::{Pair, SigmaType, SigmaTypeData},
+    unit::{Unit, UnitType},
+    universe::Universe,
+};
 
 use self::{
     application::{Application, ApplicationData},
     lambda::{Lambda, LambdaData},
-    primitives::{
-        CoproductType, CoproductTypeData, EmptyType, IdentityType, IdentityTypeData, Left,
-        LeftData, NaturalType, Pair, PairData, PiType, PiTypeData, Refl, ReflData, Right,
-        RightData, SigmaType, SigmaTypeData, Succ, Unit, UnitType, Universe, Zero,
-    },
-    variable::{Variable, VariableData},
+    primitives::coproduct::CoproductTypeData,
+    primitives::coproduct::LeftData,
+    primitives::empty::EmptyType,
+    primitives::identity::IdentityTypeData,
+    primitives::naturals::NaturalType,
+    primitives::pair::PairData,
+    variable::{FreeVariable, VariableData},
 };
 
 pub mod application;
@@ -65,7 +74,7 @@ pub enum TermData {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Term2 {
-    Variable(Variable),
+    Variable(FreeVariable),
     Lambda(Lambda),
     Application(Application),
     Universe(Universe),
@@ -93,7 +102,7 @@ pub struct Term {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Type {
     Universe(Universe),
-    Variable(Variable),
+    Variable(FreeVariable),
     PiType(PiType),
     SigmaType(SigmaType),
     CoproductType(CoproductType),
@@ -101,12 +110,6 @@ pub enum Type {
     UnitType(UnitType),
     NaturalType(NaturalType),
     IdentityType(IdentityType),
-}
-
-impl Display for TermData {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
-    }
 }
 
 impl Term {
@@ -130,7 +133,7 @@ impl Term {
         todo!()
     }
 
-    pub(crate) fn data(&self, global_context: GlobalContext) -> TermData {
+    pub(crate) fn data(&self) -> TermData {
         todo!()
     }
 
