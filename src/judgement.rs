@@ -1,7 +1,11 @@
+use std::hint::unreachable_unchecked;
+
 use crate::{
     context::ContextTree,
     terms::{
-        primitives::{NaturalType, Universe}, variable::VariableData, Term, TermIdx, Type
+        primitives::{NaturalType, Universe},
+        variable::VariableData,
+        Term, TermIdx, Type,
     },
 };
 
@@ -12,31 +16,43 @@ pub enum Judgement {
     WellFormed,
     Term(Term),
     Type(Type),
-    Equal(Term, Term),
+    EqualTerms(Term, Term),
     EqualTypes(Type, Type),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct ContextIdx(usize);
+pub(crate) struct ContextPtr(usize);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// A Judgement is a JudgementType along with its associated Context. ContextIdx points to the
 /// index of the ContextTree that we are currently focusing on i.e. the rightmost variable in a Context.
 pub struct Deduction {
     context_tree: ContextTree,
-    context_idx: ContextIdx,
+    context_ptr: ContextPtr,
     judgement: Judgement,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum JError {
-    Illegal(String),
+    Illegal(&'static str),
     NameTaken(String),
 }
 
-impl ContextIdx {
+impl ContextPtr {
     fn new() -> Self {
         Self(0)
+    }
+}
+
+impl Judgement {
+    #[inline]
+    fn replace_with_wellformed(&mut self) -> Self {
+        self.replace(Self::WellFormed)
+    }
+
+    #[inline]
+    fn replace(&mut self, judgement: Self) -> Self {
+        std::mem::replace(self, judgement)
     }
 }
 
@@ -47,18 +63,30 @@ impl Deduction {
     pub fn empty() -> Self {
         Self {
             context_tree: ContextTree::new(),
-            context_idx: ContextIdx::new(),
+            context_ptr: ContextPtr::new(),
             judgement: Judgement::WellFormed,
         }
     }
 
+    /// If the Judgement is a Type, we can introduce a Variable with the given name.
+    ///
+    /// If the Judgement is any other kind, we return an error.
     pub fn variable_introduction(&mut self, name: String) -> JResult {
-        if let Judgement::Type(typ) = &mut self.judgement {
-            todo!()
-        } else {
-            Err(JError::Illegal(
-                "Judgement must be a Type to introduce a Variable.".to_string(),
-            ))
+        // This looks weird because we do not have ownership over the Judgement.
+        match &self.judgement {
+            Judgement::Type(_) => {
+                if !self.context_tree.contains_name_at(&name, self.context_ptr) {
+                    let Judgement::Type(typ) = self.judgement.replace_with_wellformed() else {
+                        // SAFETY: We just checked that the variant was Type above.
+                        unsafe { unreachable_unchecked() }
+                    };
+                }
+
+                todo!()
+            }
+            _ => Err(JError::Illegal(
+                "Judgement must be a Type to introduce a Variable.",
+            )),
         }
     }
 
@@ -72,11 +100,10 @@ impl Deduction {
                 Ok(())
             }
             _ => Err(JError::Illegal(
-                "Judgement must be WellFormed to introduce a Type.".to_string(),
+                "Judgement must be Well Formed to introduce a Type.",
             )),
         }
     }
-
 
     pub fn universe_formation(&mut self, level: TermIdx) -> JResult {
         if let Judgement::WellFormed = self.judgement {
@@ -84,7 +111,7 @@ impl Deduction {
             Ok(())
         } else {
             Err(JError::Illegal(
-                "Judgement must be WellFormed to introduce a Universe.".to_string(),
+                "Judgement must be Well Formed to introduce a Universe.",
             ))
         }
     }

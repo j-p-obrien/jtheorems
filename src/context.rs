@@ -1,25 +1,30 @@
-use crate::terms::variable::{FreeVariable, VariableData};
+use crate::{
+    judgement::ContextPtr,
+    terms::variable::{FreeVariable, VariableData},
+};
 
 type ParentIdx = usize;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct ContextTreeNode {
     free_variable: FreeVariable,
-    parent: Option<ParentIdx>,
+    parent: ParentIdx,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Tree that stores the Context.
-/// 
+///
 /// FreeVariable is a Variable that has been legally introduced into the Context.
-/// PreviousIdx is the index of the previous FreeVariable in the ContextTree. Since the first 
+/// PreviousIdx is the index of the previous FreeVariable in the ContextTree. Since the first
 /// FreeVariable in a context does not have a predecessor, this value is optional.
-pub(crate) struct ContextTree(Vec<ContextTreeNode>);
-
+pub(crate) struct ContextTree(Vec<Option<ContextTreeNode>>);
 
 impl ContextTree {
     pub(crate) fn new() -> Self {
-        Self(vec![])
+        Self(vec![None])
+    }
+
+    pub(crate) fn contains_name_at(&self, name: &str, location: ContextPtr) -> bool {
+        todo!()
     }
 }
