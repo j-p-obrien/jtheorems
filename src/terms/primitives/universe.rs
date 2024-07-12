@@ -4,6 +4,8 @@ use crate::{deduction::judgement::JudgementKind, terms::Type};
 
 pub(crate) type UniverseLevel = usize;
 
+pub const UNIVERSE_DISPLAY: &'static str = "𝒰";
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Universe {
     level: UniverseLevel,
@@ -35,6 +37,6 @@ impl Universe {
 
 impl Display for Universe {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "𝒰_{}", self.level)
+        write!(f, "{}_{}", UNIVERSE_DISPLAY, self.level)
     }
 }

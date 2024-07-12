@@ -12,6 +12,8 @@ use crate::{
     },
 };
 
+type JudgementPtrSize = usize;
+
 pub type JResult = Result<(), JError>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -23,13 +25,22 @@ pub enum JudgementKind {
     EqualTypes(Type, Type),
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum JudgementPtr {
+    WellFormed,
+    Term(JudgementPtrSize),
+    Type(JudgementPtrSize),
+    EqualTerms(JudgementPtrSize),
+    EqualTypes(JudgementPtrSize),
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct ContextPtr(usize);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct Judgement {
-    kind: JudgementKind,
     context_ptr: ContextPtr,
+    term_ptr: JudgementPtr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

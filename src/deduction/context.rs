@@ -10,26 +10,31 @@ type ParentPtr = usize;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct ContextTreeNode {
-    free_variable: FreeVariable,
-    parent: ParentPtr,
-    term_data: Vec<JudgementKind>,
+    free_variable: Option<FreeVariable>,
+    parent: Option<ParentPtr>,
+    judgements: Vec<JudgementKind>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-/// Tree that stores the Context.
-///
-/// FreeVariable is a Variable that has been legally introduced into the Context.
-/// PreviousIdx is the index of the previous FreeVariable in the ContextTree. Since the first
-/// FreeVariable in a context does not have a predecessor, this value is optional.
 pub(crate) struct TheDomain {
-    context_tree: Vec<Option<ContextTreeNode>>,
+    context_tree: Vec<ContextTreeNode>,
     term_data: Vec<TermData>,
+}
+
+impl ContextTreeNode {
+    fn root() -> Self {
+        Self {
+            free_variable: None,
+            parent: None,
+            judgements: vec![JudgementKind::WellFormed],
+        }
+    }
 }
 
 impl TheDomain {
     pub(crate) fn new() -> Self {
         Self {
-            context_tree: vec![None],
+            context_tree: vec![ContextTreeNode::root()],
             term_data: vec![],
         }
     }
