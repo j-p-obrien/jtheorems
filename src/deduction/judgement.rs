@@ -1,7 +1,7 @@
 use std::{fmt::Display, hint::unreachable_unchecked};
 
 use crate::{
-    deduction::context::ContextTree,
+    deduction::context::TheDomain,
     terms::{
         primitives::{
             naturals::NaturalType,
@@ -36,7 +36,7 @@ pub(crate) struct Judgement {
 /// A Judgement is a JudgementType along with its associated Context. ContextIdx points to the
 /// index of the ContextTree that we are currently focusing on i.e. the rightmost variable in a Context.
 pub struct Deduction {
-    context_tree: ContextTree,
+    domain: TheDomain,
     judgement: Judgement,
 }
 
@@ -85,7 +85,7 @@ impl Deduction {
     /// This is the starting point for all proofs.
     pub fn new() -> Self {
         Self {
-            context_tree: ContextTree::new(),
+            domain: TheDomain::new(),
             judgement: Judgement::new(),
         }
     }
@@ -97,15 +97,13 @@ impl Deduction {
     pub fn variable_introduction(&mut self, name: String) -> JResult {
         // This looks weird because we do not have ownership over the Judgement.
         match &self.judgement {
-            JudgementKind::Type(_)
-                if !self.context_tree.contains_name_at(&name, self.context_ptr) =>
-            {
+            JudgementKind::Type(_) if !self.domain.contains_name_at(&name, self.context_ptr) => {
                 let JudgementKind::Type(typ) = self.judgement.replace_with_wellformed() else {
                     // SAFETY: We just checked that the variant was Type above.
                     unsafe { unreachable_unchecked() }
                 };
                 let variable_data = VariableData::new(name, typ);
-                let free_variable = self.context_tree.push_variable(variable_data);
+                let free_variable = self.domain.push_variable(variable_data);
                 todo!()
             }
             _ => Err(JError::Illegal(
