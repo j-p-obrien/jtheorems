@@ -1,7 +1,7 @@
 use std::{fmt::Display, hint::unreachable_unchecked};
 
 use crate::{
-    deduction::context::TheDomain,
+    deduction::the_domain::TheDomain,
     terms::{
         primitives::{
             naturals::NaturalType,
