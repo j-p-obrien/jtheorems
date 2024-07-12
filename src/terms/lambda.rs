@@ -1,4 +1,5 @@
-use super::{primitives::universe::Universe, variable::BoundVariable, Term, TermPtr};
+use super::{primitives::universe::Universe, variable::BoundVariable, Term};
+use crate::deduction::term_arena::TermPtr;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PiTypeData {

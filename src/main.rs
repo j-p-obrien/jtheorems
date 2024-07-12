@@ -1,12 +1,12 @@
-use jtheorems::{deduction::judgement::Deduction, parser::parser::Parser};
+use jtheorems::{deduction::terminal::Terminal, parser::parser::Parser};
 
 fn main() {
-    let mut deduction = Deduction::new();
+    let mut _terminal = Terminal::new();
     let parser = Parser::new();
     loop {
-        println!("{}", &deduction);
+        println!("{}", &_terminal);
         let mut raw_input = String::new();
         std::io::stdin().read_line(&mut raw_input).unwrap();
-        let parsed_input = parser.parse(&raw_input);
+        let _parsed_input = parser.parse(&raw_input);
     }
 }

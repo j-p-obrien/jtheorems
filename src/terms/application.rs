@@ -1,6 +1,6 @@
-use crate::terms::Term;
+use super::term::Term;
 
-use super::TermPtr;
+use crate::deduction::term_arena::TermPtr;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ApplicationData {

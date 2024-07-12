@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
-use crate::{deduction::judgement::JudgementKind, terms::Type};
+use super::super::types::Type;
+use crate::deduction::judgement::JudgementKind;
 
 pub(crate) type UniverseLevel = usize;
 

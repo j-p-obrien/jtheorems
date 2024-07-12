@@ -1,4 +1,6 @@
-use super::super::{Term, TermPtr, Type};
+use crate::deduction::term_arena::TermPtr;
+
+use super::super::{term::Term, types::Type};
 use super::universe::Universe;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

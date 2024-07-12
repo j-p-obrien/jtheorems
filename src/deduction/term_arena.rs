@@ -1,5 +1,7 @@
 use crate::terms::TermData;
 
+pub(crate) type TermPtr = usize;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct TermArena {
     term_data: Vec<TermData>,

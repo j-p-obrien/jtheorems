@@ -1,4 +1,5 @@
-use super::{Term, TermData, TermPtr, Type};
+use super::types::Type;
+use crate::deduction::term_arena::TermPtr;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VariableData {

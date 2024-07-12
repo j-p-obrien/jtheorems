@@ -1,6 +1,8 @@
-use super::super::{variable::BoundVariable, Term, TermPtr};
-
-use super::universe::Universe;
+use super::{
+    super::{variable::BoundVariable, Term},
+    universe::Universe,
+};
+use crate::deduction::term_arena::TermPtr;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SigmaTypeData {

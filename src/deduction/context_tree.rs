@@ -4,8 +4,9 @@ use crate::{
         judgement_tree::JudgementTree,
     },
     terms::{
+        term::TermData,
+        types::Type,
         variable::{FreeVariable, VariableData},
-        TermData, Type,
     },
 };
 

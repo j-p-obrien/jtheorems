@@ -1,8 +1,8 @@
 use std::fmt::Display;
 
-use crate::{deduction::judgement::JudgementKind, terms::Type};
+use crate::deduction::judgement::JudgementKind;
 
-use super::universe::Universe;
+use super::{super::types::Type, universe::Universe};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NaturalType;

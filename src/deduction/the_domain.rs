@@ -1,7 +1,9 @@
-use crate::terms::{variable::FreeVariable, Type};
+use crate::terms::{types::Type, variable::FreeVariable};
 
 use super::{context_tree::ContextTree, judgement::ContextPtr, term_arena::TermArena};
 
+/// The Domain is the central repository of all Terms and their associated Context. This data
+/// structure is the heart of the proof system.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct TheDomain {
     context_tree: ContextTree,
