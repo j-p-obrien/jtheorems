@@ -1,29 +1,40 @@
-use super::judgement::{JudgementKind, JudgementLocation};
+use super::judgement::{JudgementLocation, JudgementType};
+
+type JudgementPtrSize = usize;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) struct JudgementPtr(JudgementPtrSize);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-struct JudgementTreeNode {
-    judgement_kind: JudgementKind,
+pub(super) struct JudgementTreeNode {
+    judgement_kind: JudgementType,
     reachable: Vec<JudgementLocation>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct JudgementTree {
+pub(super) struct JudgementTree {
     judgements: Vec<JudgementTreeNode>,
 }
 
+impl JudgementPtr {
+    pub(super) fn well_formed() -> Self {
+        Self(0)
+    }
+}
+
 impl JudgementTreeNode {
-    fn new() -> Self {
+    fn root() -> Self {
         Self {
-            judgement_kind: JudgementKind::well_formed(),
+            judgement_kind: JudgementType::well_formed(),
             reachable: vec![],
         }
     }
 }
 
 impl JudgementTree {
-    pub(crate) fn new() -> Self {
+    pub(crate) fn root() -> Self {
         Self {
-            judgements: vec![JudgementTreeNode::new()],
+            judgements: vec![JudgementTreeNode::root()],
         }
     }
 }

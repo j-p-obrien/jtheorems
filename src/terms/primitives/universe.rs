@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use super::super::types::Type;
-use crate::deduction::judgement::JudgementKind;
+use crate::deduction::judgement::JudgementType;
 
 pub(crate) type UniverseLevel = usize;
 
@@ -18,9 +18,9 @@ impl Into<Type> for Universe {
     }
 }
 
-impl Into<JudgementKind> for Universe {
-    fn into(self) -> JudgementKind {
-        JudgementKind::Type(Type::Universe(self))
+impl Into<JudgementType> for Universe {
+    fn into(self) -> JudgementType {
+        JudgementType::Type(Type::Universe(self))
     }
 }
 

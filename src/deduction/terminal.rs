@@ -1,8 +1,12 @@
 use std::fmt::Display;
 
-use crate::terms::primitives::universe::UniverseLevel;
+use crate::terms::primitives::{naturals::NaturalType, universe::UniverseLevel};
 
-use super::{error::JError, judgement::Judgement, the_domain::TheDomain};
+use super::{
+    error::JError,
+    judgement::{Judgement, JudgementType},
+    the_domain::TheDomain,
+};
 
 pub type JResult = Result<(), JError>;
 
@@ -13,7 +17,7 @@ pub type JResult = Result<(), JError>;
 /// You interact with The Domain through your Terminal. It contains the current judgement and
 /// a pointer into the data contained in The Domain.
 pub struct Terminal {
-    the_domain: TheDomain,
+    domain: TheDomain,
     judgement: Judgement,
 }
 
@@ -28,7 +32,7 @@ impl Terminal {
     /// ContextTree, with a JudgementKind that is WellFormed.
     pub fn new() -> Self {
         Self {
-            the_domain: TheDomain::new(),
+            domain: TheDomain::new(),
             judgement: Judgement::new(),
         }
     }
@@ -43,9 +47,19 @@ impl Terminal {
 
     /// Forms the Natural Type.
     ///
-    /// This can be done in any WellFormed context.
+    /// This can be done whenever the Judgement type is Well Formed.
     pub fn natural_formation(&mut self) -> JResult {
-        todo!("Natural Formation")
+        match &self.judgement.judgement_kind() {
+            JudgementType::WellFormed => {
+                let naturals: JudgementType = NaturalType.into();
+                self.domain
+                    .push_judgment_at(naturals, self.judgement.judgement_location());
+                todo!("Natural Formation")
+            }
+            _ => Err(JError::Illegal(
+                "Judgement Type must be Well Formed in order to form Natural Type.",
+            )),
+        }
     }
 
     pub fn universe_formation(&mut self, level: UniverseLevel) -> JResult {

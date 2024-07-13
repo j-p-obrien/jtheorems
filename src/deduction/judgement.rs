@@ -1,22 +1,14 @@
+use super::{context_tree::ContextPtr, judgement_tree::JudgementPtr};
 use crate::terms::{types::Type, Term};
 
-pub type ContextPtrSize = usize;
-pub type JudgementPtrSize = usize;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) struct ContextPtr(ContextPtrSize);
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct JudgementPtr(JudgementPtrSize);
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct JudgementLocation {
+pub(super) struct JudgementLocation {
     context_ptr: ContextPtr,
     judgement_ptr: JudgementPtr,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum JudgementKind {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum JudgementType {
     WellFormed,
     Term(Term),
     Type(Type),
@@ -25,26 +17,13 @@ pub(crate) enum JudgementKind {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct Judgement {
+pub(super) struct Judgement {
     judgement_location: JudgementLocation,
-    judgement_kind: JudgementKind,
-}
-
-impl ContextPtr {
-    /// Creates a ContextPtr that points to the root of the ContextTree i.e. at index 0.
-    pub(crate) fn empty_context() -> Self {
-        Self(0)
-    }
-}
-
-impl JudgementPtr {
-    fn well_formed() -> Self {
-        Self(0)
-    }
+    judgement_type: JudgementType,
 }
 
 impl JudgementLocation {
-    pub(crate) fn empty_well_formed() -> Self {
+    pub(super) fn empty_well_formed() -> Self {
         Self {
             context_ptr: ContextPtr::empty_context(),
             judgement_ptr: JudgementPtr::well_formed(),
@@ -52,14 +31,14 @@ impl JudgementLocation {
     }
 }
 
-impl JudgementKind {
-    pub(crate) fn well_formed() -> Self {
+impl JudgementType {
+    pub(super) fn well_formed() -> Self {
         Self::WellFormed
     }
 
     #[inline]
     fn replace_with_wellformed(&mut self) -> Self {
-        self.replace(Self::WellFormed)
+        std::mem::replace(self, Self::WellFormed)
     }
 
     #[inline]
@@ -69,10 +48,18 @@ impl JudgementKind {
 }
 
 impl Judgement {
-    pub(crate) fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self {
             judgement_location: JudgementLocation::empty_well_formed(),
-            judgement_kind: JudgementKind::well_formed(),
+            judgement_type: JudgementType::well_formed(),
         }
+    }
+
+    pub(super) fn judgement_kind(&self) -> &JudgementType {
+        &self.judgement_type
+    }
+
+    pub(super) fn judgement_location(&self) -> &JudgementLocation {
+        &self.judgement_location
     }
 }
