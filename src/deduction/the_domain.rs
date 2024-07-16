@@ -1,11 +1,10 @@
 use std::ops::{Index, IndexMut};
 
-use crate::terms::{types::Type, variable::FreeVariable};
+use crate::terms::{primitives::naturals::NaturalType, types::Type, variable::FreeVariable};
 
 use super::{
     context_tree::{ContextPtr, ContextTree},
-    judgement::{JudgementLocation, JudgementType},
-    judgement_tree::{JudgementTree, JudgementTreeNode},
+    judgement::{Judgement, JudgementType},
     term_arena::TermArena,
 };
 
@@ -17,20 +16,6 @@ pub(super) struct TheDomain {
     term_data: TermArena,
 }
 
-impl Index<JudgementLocation> for TheDomain {
-    type Output = JudgementTreeNode;
-
-    fn index(&self, index: JudgementLocation) -> &Self::Output {
-        todo!("Index for The Domain.")
-    }
-}
-
-impl IndexMut<JudgementLocation> for TheDomain {
-    fn index_mut(&mut self, index: JudgementLocation) -> &mut Self::Output {
-        todo!("Mutable Index for The Domain.")
-    }
-}
-
 impl TheDomain {
     pub(super) fn new() -> Self {
         Self {
@@ -39,7 +24,7 @@ impl TheDomain {
         }
     }
 
-    pub(super) fn contains_name_at(&self, name: &str, location: ContextPtr) -> bool {
+    pub(super) fn contains_name_at(&self, name: &str, location: &ContextPtr) -> bool {
         todo!()
     }
 
@@ -47,11 +32,11 @@ impl TheDomain {
         todo!()
     }
 
-    pub(super) fn push_judgment_at(
-        &mut self,
-        judgement_type: JudgementType,
-        judgement_location: &JudgementLocation,
-    ) {
-        todo!()
+    pub(super) fn push_natural_type_at(&mut self, context: &ContextPtr) -> Judgement {
+        let naturals: JudgementType = NaturalType.into();
+        // TODO: Decide whether or not to actually push this into the Context Tree. Naturals are
+        // size zero and can be formed in any Context anyways.
+        self.context_tree[*context].push(naturals.clone());
+        Judgement::new(*context, naturals)
     }
 }

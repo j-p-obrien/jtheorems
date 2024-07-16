@@ -29,11 +29,11 @@ impl Display for Terminal {
 
 impl Terminal {
     /// Creates a new Terminal containing a new Domain and a pointer to the root of the
-    /// ContextTree, with a JudgementKind that is WellFormed.
+    /// ContextTree, with a Judgement Type that is WellFormed.
     pub fn new() -> Self {
         Self {
             domain: TheDomain::new(),
-            judgement: Judgement::new(),
+            judgement: Judgement::well_formed_empty_context(),
         }
     }
 
@@ -49,12 +49,10 @@ impl Terminal {
     ///
     /// This can be done whenever the Judgement type is Well Formed.
     pub fn natural_formation(&mut self) -> JResult {
-        match &self.judgement.judgement_kind() {
+        match self.judgement.judgement_type() {
             JudgementType::WellFormed => {
-                let naturals: JudgementType = NaturalType.into();
-                self.domain
-                    .push_judgment_at(naturals, self.judgement.judgement_location());
-                todo!("Natural Formation")
+                self.judgement = self.domain.push_natural_type_at(self.judgement.context());
+                Ok(())
             }
             _ => Err(JError::Illegal(
                 "Judgement Type must be Well Formed in order to form Natural Type.",
