@@ -1,7 +1,7 @@
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DefinedData {}
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Defined {}
 
 impl Defined {

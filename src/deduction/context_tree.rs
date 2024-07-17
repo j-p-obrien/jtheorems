@@ -2,7 +2,10 @@ use std::ops::{Index, IndexMut};
 
 use crate::terms::{types::Type, variable::FreeVariable, Term};
 
-use super::judgement::{Judgement, JudgementType};
+use super::{
+    judgement::{Judgement, JudgementType},
+    term_arena::TermArena,
+};
 
 type ContextPtrSize = usize;
 
@@ -13,7 +16,7 @@ pub(super) struct ContextPtr(ContextPtrSize);
 pub(super) struct ContextTreeNode {
     free_variable: Option<FreeVariable>,
     parent: Option<ContextPtr>,
-    constructible: Vec<JudgementType>,
+    constructed: Vec<JudgementType>,
     reachable: Vec<ContextPtr>,
 }
 
@@ -52,13 +55,13 @@ impl ContextTreeNode {
         Self {
             free_variable: None,
             parent: None,
-            constructible: vec![JudgementType::well_formed()],
+            constructed: vec![],
             reachable: vec![],
         }
     }
 
     pub(super) fn push(&mut self, judgement_type: JudgementType) {
-        self.constructible.push(judgement_type)
+        self.constructed.push(judgement_type)
     }
 }
 
@@ -67,5 +70,28 @@ impl ContextTree {
         Self {
             nodes: vec![ContextTreeNode::root()],
         }
+    }
+
+    pub(super) fn contains_name_at(
+        &self,
+        name: &str,
+        location: ContextPtr,
+        term_data: &TermArena,
+    ) -> bool {
+        if let Some(variable) = self[location].free_variable {
+            if variable.data.name() == name {
+                return true;
+            }
+        }
+        let mut current = location;
+        while let Some(parent) = self[current].parent {
+            if let Some(free_variable) = self[parent].free_variable {
+                if free_variable.data.name() == name {
+                    return true;
+                }
+            }
+            current = parent;
+        }
+        false
     }
 }

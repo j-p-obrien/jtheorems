@@ -1,18 +1,24 @@
-use super::{primitives::universe::Universe, variable::BoundVariable, Term};
+use super::{primitives::universe::Universe, types::Type, variable::BoundVariable, Term};
 use crate::deduction::term_arena::TermPtr;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PiTypeData {
     variable: BoundVariable,
-    output_typ: Term,
+    output_typ: Type,
     //dependent: bool,
     universe: Universe,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PiType {
     /// Points to a PiTypeData
-    id: TermPtr,
+    data: TermPtr,
+    //universe: Universe,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FunctionType {
+    data: TermPtr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -22,8 +28,14 @@ pub struct LambdaData {
     typ: PiType,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Lambda {
     /// Points to a LambdaData
-    id: TermPtr,
+    data: TermPtr,
+    //typ: PiType,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TypeFamily {
+    data: TermPtr,
 }

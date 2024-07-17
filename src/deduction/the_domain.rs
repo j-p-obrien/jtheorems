@@ -1,6 +1,4 @@
-use std::ops::{Index, IndexMut};
-
-use crate::terms::{primitives::naturals::NaturalType, types::Type, variable::FreeVariable};
+use crate::terms::{primitives::naturals::NaturalType, types::Type};
 
 use super::{
     context_tree::{ContextPtr, ContextTree},
@@ -24,19 +22,20 @@ impl TheDomain {
         }
     }
 
-    pub(super) fn contains_name_at(&self, name: &str, location: &ContextPtr) -> bool {
+    pub(super) fn contains_name_at(&self, name: &str, location: ContextPtr) -> bool {
+        self.context_tree
+            .contains_name_at(name, location, &self.term_data)
+    }
+
+    pub(super) fn push_variable(&mut self, name: String, typ: Type) -> Judgement {
         todo!()
     }
 
-    pub(super) fn push_variable(&mut self, name: String, typ: Type) -> FreeVariable {
-        todo!()
-    }
-
-    pub(super) fn push_natural_type_at(&mut self, context: &ContextPtr) -> Judgement {
+    pub(super) fn push_natural_type_at(&mut self, context: ContextPtr) -> Judgement {
         let naturals: JudgementType = NaturalType.into();
         // TODO: Decide whether or not to actually push this into the Context Tree. Naturals are
         // size zero and can be formed in any Context anyways.
-        self.context_tree[*context].push(naturals.clone());
-        Judgement::new(*context, naturals)
+        self.context_tree[context].push(naturals.clone());
+        Judgement::new(context, naturals)
     }
 }

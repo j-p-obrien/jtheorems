@@ -10,10 +10,11 @@ pub struct CoproductTypeData {
     universe: Universe,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CoproductType {
     /// Points to a CoproductTypeData
-    id: TermPtr,
+    data: TermPtr,
+    //universe: Universe,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -22,10 +23,11 @@ pub struct LeftData {
     typ: CoproductType,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Left {
     /// Points to a LeftData
-    id: TermPtr,
+    data: TermPtr,
+    //typ: CoproductType,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -34,8 +36,9 @@ pub struct RightData {
     typ: CoproductType,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Right {
     /// Points to a RightData
-    id: TermPtr,
+    data: TermPtr,
+    //typ: CoproductType,
 }

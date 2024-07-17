@@ -14,13 +14,15 @@ pub struct Universe {
 
 impl Into<Type> for Universe {
     fn into(self) -> Type {
-        Type::Universe(self)
+        //Type::Universe(self)
+        todo!()
     }
 }
 
 impl Into<JudgementType> for Universe {
     fn into(self) -> JudgementType {
-        JudgementType::Type(Type::Universe(self))
+        //JudgementType::Type(Type::Universe(self))
+        todo!()
     }
 }
 

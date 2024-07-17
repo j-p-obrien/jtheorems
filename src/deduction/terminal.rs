@@ -3,6 +3,7 @@ use std::fmt::Display;
 use crate::terms::primitives::{naturals::NaturalType, universe::UniverseLevel};
 
 use super::{
+    context_tree::ContextPtr,
     error::JError,
     judgement::{Judgement, JudgementType},
     the_domain::TheDomain,
@@ -37,21 +38,43 @@ impl Terminal {
         }
     }
 
+    pub fn judgement_type(&self) -> &JudgementType {
+        self.judgement.judgement_type()
+    }
+
+    pub(super) fn context_ptr(&self) -> ContextPtr {
+        self.judgement.context_ptr()
+    }
+
     /// If the Judgement is a Type and the given name is not taken, we can introduce a FreeVariable
     /// with that name.
     ///
     /// If the Judgement is any other variant, or the name is taken we return an error.
     pub fn variable_introduction(&mut self, name: String) -> JResult {
-        todo!("Variable Introduction")
+        match self.judgement_type() {
+            JudgementType::Type(typ) => {
+                if !self.domain.contains_name_at(&name, self.context_ptr()) {
+                    self.judgement = self.domain.push_variable(name, *typ);
+                    Ok(())
+                } else {
+                    Err(JError::Illegal("Name already taken."))
+                }
+            }
+            _ => Err(JError::Illegal(
+                "Judgement Type must be Well Formed in order to introduce a variable.",
+            )),
+        }
     }
 
     /// Forms the Natural Type.
     ///
     /// This can be done whenever the Judgement type is Well Formed.
     pub fn natural_formation(&mut self) -> JResult {
-        match self.judgement.judgement_type() {
+        match self.judgement_type() {
             JudgementType::WellFormed => {
-                self.judgement = self.domain.push_natural_type_at(self.judgement.context());
+                self.judgement = self
+                    .domain
+                    .push_natural_type_at(self.judgement.context_ptr());
                 Ok(())
             }
             _ => Err(JError::Illegal(

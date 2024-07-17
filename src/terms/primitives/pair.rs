@@ -2,20 +2,25 @@ use super::{
     super::{variable::BoundVariable, Term},
     universe::Universe,
 };
-use crate::deduction::term_arena::TermPtr;
+use crate::{deduction::term_arena::TermPtr, terms::types::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SigmaTypeData {
     variable: BoundVariable,
-    output_typ: Term,
-    dependent: bool,
+    output_typ: Type,
     universe: Universe,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SigmaType {
     /// Points to a SigmaTypeData
-    id: TermPtr,
+    data: TermPtr,
+    //universe: Universe,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ProductType {
+    data: TermPtr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -25,8 +30,9 @@ pub struct PairData {
     typ: SigmaType,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Pair {
     /// Points to a PairData
-    id: TermPtr,
+    data: TermPtr,
+    //typ: SigmaType,
 }

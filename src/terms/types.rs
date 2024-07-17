@@ -1,22 +1,18 @@
 use super::{
-    application::{Application, ApplicationData},
-    defined::{Defined, DefinedData},
-    lambda::{Lambda, LambdaData, PiType, PiTypeData},
+    defined::Defined,
+    lambda::PiType,
     primitives::{
-        coproduct::{CoproductType, CoproductTypeData, Left, LeftData, Right, RightData},
-        empty::EmptyType,
-        identity::{IdentityType, IdentityTypeData, Refl, ReflData},
-        naturals::{NaturalType, Succ, Zero},
-        pair::{Pair, PairData, SigmaType, SigmaTypeData},
-        unit::{Unit, UnitType},
-        universe::Universe,
+        coproduct::CoproductType, empty::EmptyType, identity::IdentityType, naturals::NaturalType,
+        pair::SigmaType, unit::UnitType, universe::Universe,
     },
-    variable::{FreeVariable, VariableData},
+    variable::{BoundVariable, FreeVariable},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Type {
-    Variable(FreeVariable),
+    //Variable(TypeVariable),
+    FreeVariable(FreeVariable),
+    BoundVariable(BoundVariable),
     Defined(Defined),
     Universe(Universe),
     PiType(PiType),

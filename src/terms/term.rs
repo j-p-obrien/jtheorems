@@ -11,7 +11,7 @@ use super::{
         unit::{Unit, UnitType},
         universe::Universe,
     },
-    variable::{FreeVariable, VariableData},
+    variable::{BoundVariable, FreeVariable, VariableData},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -37,9 +37,10 @@ pub enum TermData {
     Refl(ReflData),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Term {
-    Variable(FreeVariable),
+    FreeVariable(FreeVariable),
+    BoundVariable(BoundVariable),
     Lambda(Lambda),
     Application(Application),
     Defined(Defined),

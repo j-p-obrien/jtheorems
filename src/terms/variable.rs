@@ -7,21 +7,29 @@ pub struct VariableData {
     typ: Type,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct FreeVariable {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FreeVariable {
     /// Points to a VariableData
-    id: TermPtr,
+    data: TermPtr,
+    //typ: Type,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct BoundVariable {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BoundVariable {
     /// Points to a VariableData
-    id: TermPtr,
+    data: TermPtr,
+    //typ: Type,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TypeVariable {
+    data: TermPtr,
+    //universe: Universe,
 }
 
 impl VariableData {
     pub fn new(name: String, typ: Type) -> Self {
-        Self { name, typ }
+        todo!()
     }
 
     pub(crate) fn is_type(&self) -> bool {
