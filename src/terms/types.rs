@@ -1,3 +1,5 @@
+use crate::deduction::term_arena::TermArena;
+
 use super::{
     defined::Defined,
     lambda::PiType,
@@ -10,7 +12,6 @@ use super::{
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Type {
-    //Variable(TypeVariable),
     FreeVariable(FreeVariable),
     BoundVariable(BoundVariable),
     Defined(Defined),
@@ -22,4 +23,15 @@ pub enum Type {
     UnitType(UnitType),
     NaturalType(NaturalType),
     IdentityType(IdentityType),
+}
+
+impl Type {
+    pub(super) fn name_is_taken(&self, name: &str, term_data: &TermArena) -> bool {
+        match self {
+            Type::FreeVariable(free_variable) => free_variable.name_is_taken(name, term_data),
+            Type::BoundVariable(bound_variable) => bound_variable.name_is_taken(name, term_data),
+            Type::Defined(_) => todo!("Determine how to deal with names for Defined types."),
+            _ => false,
+        }
+    }
 }

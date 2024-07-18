@@ -66,15 +66,17 @@ impl Terminal {
         }
     }
 
+    pub fn variable_rule(&mut self) -> JResult {
+        todo!("Variable Rule")
+    }
+
     /// Forms the Natural Type.
     ///
     /// This can be done whenever the Judgement type is Well Formed.
     pub fn natural_formation(&mut self) -> JResult {
         match self.judgement_type() {
             JudgementType::WellFormed => {
-                self.judgement = self
-                    .domain
-                    .push_natural_type_at(self.judgement.context_ptr());
+                self.judgement = self.domain.form_natural_type_at(self.context_ptr());
                 Ok(())
             }
             _ => Err(JError::Illegal(

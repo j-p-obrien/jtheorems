@@ -79,18 +79,13 @@ impl ContextTree {
         term_data: &TermArena,
     ) -> bool {
         if let Some(variable) = self[location].free_variable {
-            if variable.data.name() == name {
+            if variable.name_is_taken(name, term_data) {
                 return true;
             }
         }
-        let mut current = location;
-        while let Some(parent) = self[current].parent {
-            if let Some(free_variable) = self[parent].free_variable {
-                if free_variable.data.name() == name {
-                    return true;
-                }
-            }
-            current = parent;
+        let mut current = self[location].parent;
+        while let Some(parent) = current {
+            todo!()
         }
         false
     }

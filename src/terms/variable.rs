@@ -1,5 +1,7 @@
-use super::types::Type;
-use crate::deduction::term_arena::TermPtr;
+use std::{hint::unreachable_unchecked, ops::Bound};
+
+use super::{types::Type, TermData};
+use crate::deduction::term_arena::{TermArena, TermPtr};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VariableData {
@@ -28,7 +30,7 @@ pub struct TypeVariable {
 }
 
 impl VariableData {
-    pub fn new(name: String, typ: Type) -> Self {
+    pub(crate) fn new(name: String, typ: Type) -> Self {
         todo!()
     }
 
@@ -37,7 +39,7 @@ impl VariableData {
     }
 
     pub(crate) fn typ(&self) -> &Type {
-        todo!()
+        &self.typ
     }
 
     pub(crate) fn has_name(&self, name: &str) -> bool {
@@ -46,5 +48,33 @@ impl VariableData {
 
     pub(crate) fn name(&self) -> &str {
         &self.name
+    }
+}
+
+impl FreeVariable {
+    pub(crate) fn name_is_taken(&self, name: &str, term_data: &TermArena) -> bool {
+        if let TermData::Variable(variable_data) = &term_data[self.data] {
+            variable_data.has_name(name)
+        } else {
+            if cfg!(debug_assertions) {
+                unreachable!("A FreeVariable should always point to a VariableData.")
+            } else {
+                unsafe { unreachable_unchecked() }
+            }
+        }
+    }
+}
+
+impl BoundVariable {
+    pub(crate) fn name_is_taken(&self, name: &str, term_data: &TermArena) -> bool {
+        if let TermData::Variable(variable_data) = &term_data[self.data] {
+            variable_data.has_name(name)
+        } else {
+            if cfg!(debug_assertions) {
+                unreachable!("A BoundVariable should always point to a VariableData.")
+            } else {
+                unsafe { unreachable_unchecked() }
+            }
+        }
     }
 }

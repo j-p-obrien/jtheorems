@@ -31,7 +31,7 @@ impl TheDomain {
         todo!()
     }
 
-    pub(super) fn push_natural_type_at(&mut self, context: ContextPtr) -> Judgement {
+    pub(super) fn form_natural_type_at(&mut self, context: ContextPtr) -> Judgement {
         let naturals: JudgementType = NaturalType.into();
         // TODO: Decide whether or not to actually push this into the Context Tree. Naturals are
         // size zero and can be formed in any Context anyways.
