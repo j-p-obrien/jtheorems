@@ -51,30 +51,48 @@ impl VariableData {
     }
 }
 
+impl From<TermPtr> for FreeVariable {
+    fn from(data: TermPtr) -> Self {
+        Self { data }
+    }
+}
+
+impl From<VariableData> for TermData {
+    fn from(data: VariableData) -> Self {
+        Self::Variable(data)
+    }
+}
+
 impl FreeVariable {
-    pub(crate) fn name_is_taken(&self, name: &str, term_data: &TermArena) -> bool {
+    fn get_data_unchecked<'a>(&self, term_data: &'a TermArena) -> &'a VariableData {
         if let TermData::Variable(variable_data) = &term_data[self.data] {
-            variable_data.has_name(name)
+            variable_data
+        } else if cfg!(debug_assertions) {
+            unreachable!("A FreeVariable should always point to a VariableData.")
         } else {
-            if cfg!(debug_assertions) {
-                unreachable!("A FreeVariable should always point to a VariableData.")
-            } else {
-                unsafe { unreachable_unchecked() }
-            }
+            // SAFETY: A FreeVariable should always point to a VariableData.
+            unsafe { unreachable_unchecked() }
         }
+    }
+
+    pub(crate) fn has_name(&self, name: &str, term_data: &TermArena) -> bool {
+        self.get_data_unchecked(term_data).has_name(name)
     }
 }
 
 impl BoundVariable {
-    pub(crate) fn name_is_taken(&self, name: &str, term_data: &TermArena) -> bool {
+    fn get_data_unchecked<'a>(&self, term_data: &'a TermArena) -> &'a VariableData {
         if let TermData::Variable(variable_data) = &term_data[self.data] {
-            variable_data.has_name(name)
+            variable_data
+        } else if cfg!(debug_assertions) {
+            unreachable!("A BoundVariable should always point to a VariableData.")
         } else {
-            if cfg!(debug_assertions) {
-                unreachable!("A BoundVariable should always point to a VariableData.")
-            } else {
-                unsafe { unreachable_unchecked() }
-            }
+            // SAFETY: A FreeVariable should always point to a VariableData.
+            unsafe { unreachable_unchecked() }
         }
+    }
+
+    pub(crate) fn has_name(&self, name: &str, term_data: &TermArena) -> bool {
+        self.get_data_unchecked(term_data).has_name(name)
     }
 }

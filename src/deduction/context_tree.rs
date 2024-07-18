@@ -1,4 +1,7 @@
-use std::ops::{Index, IndexMut};
+use std::{
+    hint::unreachable_unchecked,
+    ops::{Index, IndexMut},
+};
 
 use crate::terms::{types::Type, variable::FreeVariable, Term};
 
@@ -13,11 +16,23 @@ type ContextPtrSize = usize;
 pub(super) struct ContextPtr(ContextPtrSize);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) struct ContextTreeNode {
-    free_variable: Option<FreeVariable>,
-    parent: Option<ContextPtr>,
+pub(super) struct EmptyContext {
     constructed: Vec<JudgementType>,
     reachable: Vec<ContextPtr>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(super) struct NonEmpty {
+    variable: FreeVariable,
+    parent: ContextPtr,
+    constructed: Vec<JudgementType>,
+    reachable: Vec<ContextPtr>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(super) enum ContextTreeNode {
+    EmptyContext(EmptyContext),
+    NonEmpty(NonEmpty),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -29,13 +44,23 @@ impl Index<ContextPtr> for ContextTree {
     type Output = ContextTreeNode;
 
     fn index(&self, index: ContextPtr) -> &Self::Output {
-        &self.nodes[index.index()]
+        if cfg!(debug_assertions) {
+            &self.nodes[index.index()]
+        } else {
+            // SAFETY: The index should always be in bounds.
+            unsafe { self.nodes.get_unchecked(index.index()) }
+        }
     }
 }
 
 impl IndexMut<ContextPtr> for ContextTree {
     fn index_mut(&mut self, index: ContextPtr) -> &mut Self::Output {
-        &mut self.nodes[index.index()]
+        if cfg!(debug_assertions) {
+            &mut self.nodes[index.index()]
+        } else {
+            // SAFETY: The index should always be in bounds.
+            unsafe { self.nodes.get_unchecked_mut(index.index()) }
+        }
     }
 }
 
@@ -45,30 +70,53 @@ impl ContextPtr {
         Self(0)
     }
 
-    pub(super) fn index(&self) -> usize {
+    fn index(&self) -> usize {
         self.0
+    }
+
+    fn is_empty_context(&self) -> bool {
+        self.0 == 0
     }
 }
 
 impl ContextTreeNode {
-    fn root() -> Self {
-        Self {
-            free_variable: None,
-            parent: None,
+    fn empty_context() -> Self {
+        Self::EmptyContext(EmptyContext {
             constructed: vec![],
             reachable: vec![],
-        }
+        })
     }
 
-    pub(super) fn push(&mut self, judgement_type: JudgementType) {
-        self.constructed.push(judgement_type)
+    fn push(&mut self, judgement_type: JudgementType) {
+        match self {
+            ContextTreeNode::EmptyContext(root) => root.constructed.push(judgement_type),
+            ContextTreeNode::NonEmpty(node) => node.constructed.push(judgement_type),
+        }
     }
 }
 
 impl ContextTree {
-    pub(super) fn root() -> Self {
+    pub(super) fn new() -> Self {
         Self {
-            nodes: vec![ContextTreeNode::root()],
+            nodes: vec![ContextTreeNode::empty_context()],
+        }
+    }
+
+    pub(super) fn push_at(&mut self, location: ContextPtr, judgement_type: JudgementType) {
+        self[location].push(judgement_type)
+    }
+
+    /// This function should only be used if you have already checked that ContextPtr is
+    /// not root and also is less than the length of the ContextTree (Which should hopefully always
+    /// be the case anyways).
+    unsafe fn get_child_node_unchecked(&self, location: ContextPtr) -> &NonEmpty {
+        if let ContextTreeNode::NonEmpty(node) = &self[location] {
+            node
+        } else if cfg!(debug_assertions) {
+            unreachable!("ContextPtr should not be root when this function is called.")
+        } else {
+            // SAFETY: ContextPtr should not be root when this function is called.
+            unsafe { unreachable_unchecked() }
         }
     }
 
@@ -78,15 +126,31 @@ impl ContextTree {
         location: ContextPtr,
         term_data: &TermArena,
     ) -> bool {
-        if let Some(variable) = self[location].free_variable {
-            if variable.name_is_taken(name, term_data) {
+        let mut current = location;
+        loop {
+            if current.is_empty_context() {
+                return false;
+            }
+            // SAFETY: We have already checked that current is not root.
+            let node = unsafe { self.get_child_node_unchecked(current) };
+            if node.variable.has_name(name, term_data) {
                 return true;
             }
+            current = node.parent;
         }
-        let mut current = self[location].parent;
-        while let Some(parent) = current {
-            todo!()
-        }
-        false
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn push_variable_x() {
+        let mut term_data = TermArena::new();
+        let mut context_tree = ContextTree::new();
+        todo!()
+    }
+
+    #[test]
+    fn test_context_tree() {}
 }

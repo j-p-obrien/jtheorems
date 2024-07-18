@@ -15,18 +15,6 @@ pub struct Zero();
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Succ();
 
-impl Into<Type> for NaturalType {
-    fn into(self) -> Type {
-        Type::NaturalType(self)
-    }
-}
-
-impl Into<JudgementType> for NaturalType {
-    fn into(self) -> JudgementType {
-        JudgementType::Type(Type::NaturalType(self))
-    }
-}
-
 impl Display for NaturalType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{NATURAL_DISPLAY}")
@@ -39,14 +27,26 @@ impl NaturalType {
     }
 }
 
-impl Into<Term> for Zero {
-    fn into(self) -> Term {
-        Term::Zero(self)
+impl From<NaturalType> for Type {
+    fn from(value: NaturalType) -> Self {
+        Type::NaturalType(value)
     }
 }
 
-impl Into<JudgementType> for Zero {
-    fn into(self) -> JudgementType {
-        JudgementType::Term(Term::Zero(self))
+impl From<NaturalType> for JudgementType {
+    fn from(value: NaturalType) -> Self {
+        JudgementType::Type(Type::NaturalType(value))
+    }
+}
+
+impl From<Zero> for Term {
+    fn from(value: Zero) -> Self {
+        Term::Zero(value)
+    }
+}
+
+impl From<Zero> for JudgementType {
+    fn from(value: Zero) -> Self {
+        JudgementType::Term(Term::Zero(value))
     }
 }

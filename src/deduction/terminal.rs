@@ -54,7 +54,9 @@ impl Terminal {
         match self.judgement_type() {
             JudgementType::Type(typ) => {
                 if !self.domain.contains_name_at(&name, self.context_ptr()) {
-                    self.judgement = self.domain.push_variable(name, *typ);
+                    self.judgement = self
+                        .domain
+                        .variable_intro_at(name, *typ, self.context_ptr());
                     Ok(())
                 } else {
                     Err(JError::Illegal("Name already taken."))
@@ -87,5 +89,28 @@ impl Terminal {
 
     pub fn universe_formation(&mut self, level: UniverseLevel) -> JResult {
         todo!("Universe Formation")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_natural_formation() {
+        assert_eq!(Terminal::new().natural_formation(), Ok(()));
+    }
+
+    #[test]
+    fn test_nautral_variable_introduction() {
+        let mut terminal = Terminal::new();
+        assert_eq!(terminal.natural_formation(), Ok(()));
+        let x_name = "x".to_string();
+        assert_eq!(terminal.variable_introduction(x_name.clone()), Ok(()));
+        assert_eq!(
+            terminal.variable_introduction("x".to_string()),
+            Err(JError::Illegal("Name already taken."))
+        );
+        todo!()
     }
 }

@@ -17,7 +17,7 @@ pub(super) struct TheDomain {
 impl TheDomain {
     pub(super) fn new() -> Self {
         Self {
-            context_tree: ContextTree::root(),
+            context_tree: ContextTree::new(),
             term_data: TermArena::new(),
         }
     }
@@ -27,7 +27,13 @@ impl TheDomain {
             .contains_name_at(name, location, &self.term_data)
     }
 
-    pub(super) fn push_variable(&mut self, name: String, typ: Type) -> Judgement {
+    pub(super) fn variable_intro_at(
+        &mut self,
+        name: String,
+        typ: Type,
+        location: ContextPtr,
+    ) -> Judgement {
+        let variable = self.term_data.push_variable(name, typ);
         todo!()
     }
 
@@ -35,7 +41,19 @@ impl TheDomain {
         let naturals: JudgementType = NaturalType.into();
         // TODO: Decide whether or not to actually push this into the Context Tree. Naturals are
         // size zero and can be formed in any Context anyways.
-        self.context_tree[context].push(naturals.clone());
+        self.context_tree.push_at(context, naturals.clone());
         Judgement::new(context, naturals)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_natural_formation() {
+        let mut domain = TheDomain::new();
+        let judgement = domain.form_natural_type_at(ContextPtr::empty_context());
+        assert_eq!(judgement.judgement_type(), &NaturalType.into());
     }
 }
