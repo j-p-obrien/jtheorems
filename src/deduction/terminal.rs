@@ -3,7 +3,7 @@ use std::fmt::Display;
 use crate::terms::primitives::{naturals::NaturalType, universe::UniverseLevel};
 
 use super::{
-    context_tree::ContextPtr,
+    context_tree::Context,
     error::JError,
     judgement::{Judgement, JudgementType},
     the_domain::TheDomain,
@@ -42,7 +42,7 @@ impl Terminal {
         self.judgement.judgement_type()
     }
 
-    pub(super) fn context_ptr(&self) -> ContextPtr {
+    pub(super) fn context_ptr(&self) -> Context {
         self.judgement.context_ptr()
     }
 
@@ -102,15 +102,16 @@ mod tests {
     }
 
     #[test]
-    fn test_nautral_variable_introduction() {
+    fn test_natural_variable_introduction() {
         let mut terminal = Terminal::new();
         assert_eq!(terminal.natural_formation(), Ok(()));
         let x_name = "x".to_string();
         assert_eq!(terminal.variable_introduction(x_name.clone()), Ok(()));
+        assert_eq!(terminal.natural_formation(), Ok(()));
         assert_eq!(
             terminal.variable_introduction("x".to_string()),
             Err(JError::Illegal("Name already taken."))
         );
-        todo!()
+        assert_eq!(terminal.variable_introduction("y".to_string()), Ok(()))
     }
 }

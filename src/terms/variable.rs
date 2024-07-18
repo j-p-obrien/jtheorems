@@ -1,4 +1,4 @@
-use std::{hint::unreachable_unchecked, ops::Bound};
+use std::hint::unreachable_unchecked;
 
 use super::{types::Type, TermData};
 use crate::deduction::term_arena::{TermArena, TermPtr};
@@ -31,11 +31,11 @@ pub struct TypeVariable {
 
 impl VariableData {
     pub(crate) fn new(name: String, typ: Type) -> Self {
-        todo!()
+        Self { name, typ }
     }
 
     pub(crate) fn is_type(&self) -> bool {
-        todo!()
+        self.typ().is_universe()
     }
 
     pub(crate) fn typ(&self) -> &Type {

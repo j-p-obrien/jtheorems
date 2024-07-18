@@ -1,4 +1,4 @@
-use super::context_tree::ContextPtr;
+use super::context_tree::Context;
 use crate::terms::{types::Type, Term};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -12,7 +12,7 @@ pub enum JudgementType {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Judgement {
-    context_ptr: ContextPtr,
+    context_ptr: Context,
     judgement_type: JudgementType,
 }
 
@@ -31,7 +31,7 @@ impl JudgementType {
 }
 
 impl Judgement {
-    pub(super) fn new(context: ContextPtr, judgement_type: JudgementType) -> Self {
+    pub(super) fn new(context: Context, judgement_type: JudgementType) -> Self {
         Self {
             context_ptr: context,
             judgement_type,
@@ -40,7 +40,14 @@ impl Judgement {
 
     pub(super) fn well_formed_empty_context() -> Self {
         Self {
-            context_ptr: ContextPtr::empty_context(),
+            context_ptr: Context::empty_context(),
+            judgement_type: JudgementType::well_formed(),
+        }
+    }
+
+    pub(super) fn well_formed_at(location: Context) -> Self {
+        Self {
+            context_ptr: location,
             judgement_type: JudgementType::well_formed(),
         }
     }
@@ -49,7 +56,7 @@ impl Judgement {
         &self.judgement_type
     }
 
-    pub(super) fn context_ptr(&self) -> ContextPtr {
+    pub(super) fn context_ptr(&self) -> Context {
         self.context_ptr
     }
 }

@@ -22,3 +22,12 @@ pub enum Type {
     NaturalType(NaturalType),
     IdentityType(IdentityType),
 }
+
+impl Type {
+    pub(super) fn is_universe(&self) -> bool {
+        match self {
+            Type::Universe(_) => true,
+            _ => false,
+        }
+    }
+}

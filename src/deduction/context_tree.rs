@@ -10,23 +10,23 @@ use super::{
     term_arena::TermArena,
 };
 
-type ContextPtrSize = usize;
+type ContextPtr = usize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) struct ContextPtr(ContextPtrSize);
+pub(super) struct Context(ContextPtr);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct EmptyContext {
     constructed: Vec<JudgementType>,
-    reachable: Vec<ContextPtr>,
+    reachable: Vec<Context>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct NonEmpty {
     variable: FreeVariable,
-    parent: ContextPtr,
+    parent: Context,
     constructed: Vec<JudgementType>,
-    reachable: Vec<ContextPtr>,
+    reachable: Vec<Context>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -40,10 +40,16 @@ pub(super) struct ContextTree {
     nodes: Vec<ContextTreeNode>,
 }
 
-impl Index<ContextPtr> for ContextTree {
+impl From<ContextPtr> for Context {
+    fn from(index: ContextPtr) -> Self {
+        Self(index)
+    }
+}
+
+impl Index<Context> for ContextTree {
     type Output = ContextTreeNode;
 
-    fn index(&self, index: ContextPtr) -> &Self::Output {
+    fn index(&self, index: Context) -> &Self::Output {
         if cfg!(debug_assertions) {
             &self.nodes[index.index()]
         } else {
@@ -53,8 +59,8 @@ impl Index<ContextPtr> for ContextTree {
     }
 }
 
-impl IndexMut<ContextPtr> for ContextTree {
-    fn index_mut(&mut self, index: ContextPtr) -> &mut Self::Output {
+impl IndexMut<Context> for ContextTree {
+    fn index_mut(&mut self, index: Context) -> &mut Self::Output {
         if cfg!(debug_assertions) {
             &mut self.nodes[index.index()]
         } else {
@@ -64,7 +70,7 @@ impl IndexMut<ContextPtr> for ContextTree {
     }
 }
 
-impl ContextPtr {
+impl Context {
     /// Creates a ContextPtr that points to the root of the ContextTree i.e. at index 0.
     pub(super) fn empty_context() -> Self {
         Self(0)
@@ -87,10 +93,17 @@ impl ContextTreeNode {
         })
     }
 
-    fn push(&mut self, judgement_type: JudgementType) {
+    fn add_judgement(&mut self, judgement_type: JudgementType) {
         match self {
             ContextTreeNode::EmptyContext(root) => root.constructed.push(judgement_type),
             ContextTreeNode::NonEmpty(node) => node.constructed.push(judgement_type),
+        }
+    }
+
+    fn add_reachable_context(&mut self, context: Context) {
+        match self {
+            ContextTreeNode::EmptyContext(root) => root.reachable.push(context),
+            ContextTreeNode::NonEmpty(node) => node.reachable.push(context),
         }
     }
 }
@@ -102,14 +115,14 @@ impl ContextTree {
         }
     }
 
-    pub(super) fn push_at(&mut self, location: ContextPtr, judgement_type: JudgementType) {
-        self[location].push(judgement_type)
+    pub(super) fn add_judgement_at(&mut self, location: Context, judgement_type: JudgementType) {
+        self[location].add_judgement(judgement_type)
     }
 
     /// This function should only be used if you have already checked that ContextPtr is
     /// not root and also is less than the length of the ContextTree (Which should hopefully always
     /// be the case anyways).
-    unsafe fn get_child_node_unchecked(&self, location: ContextPtr) -> &NonEmpty {
+    unsafe fn get_child_node_unchecked(&self, location: Context) -> &NonEmpty {
         if let ContextTreeNode::NonEmpty(node) = &self[location] {
             node
         } else if cfg!(debug_assertions) {
@@ -123,7 +136,7 @@ impl ContextTree {
     pub(super) fn contains_name_at(
         &self,
         name: &str,
-        location: ContextPtr,
+        location: Context,
         term_data: &TermArena,
     ) -> bool {
         let mut current = location;
@@ -138,6 +151,23 @@ impl ContextTree {
             }
             current = node.parent;
         }
+    }
+
+    pub(super) fn variable_intro_at(
+        &mut self,
+        variable: FreeVariable,
+        location: Context,
+    ) -> Context {
+        let new_node = ContextTreeNode::NonEmpty(NonEmpty {
+            variable,
+            parent: location,
+            constructed: vec![],
+            reachable: vec![],
+        });
+        let new_location: Context = self.nodes.len().into();
+        self[location].add_reachable_context(new_location);
+        self.nodes.push(new_node);
+        new_location
     }
 }
 

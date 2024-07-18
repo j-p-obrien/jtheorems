@@ -34,6 +34,19 @@ impl TermPtr {
     }
 }
 
+impl Index<TermPtr> for TermArena {
+    type Output = TermData;
+
+    fn index(&self, index: TermPtr) -> &Self::Output {
+        if cfg!(debug_assertions) {
+            &self.term_data[index.index()]
+        } else {
+            // SAFETY: The index should always be in bounds.
+            unsafe { self.term_data.get_unchecked(index.index()) }
+        }
+    }
+}
+
 impl TermArena {
     pub(super) fn new() -> Self {
         Self {
@@ -52,18 +65,5 @@ impl TermArena {
         let variable_data = VariableData::new(name, typ);
         self.term_data.push(variable_data.into());
         ptr.into()
-    }
-}
-
-impl Index<TermPtr> for TermArena {
-    type Output = TermData;
-
-    fn index(&self, index: TermPtr) -> &Self::Output {
-        if cfg!(debug_assertions) {
-            &self.term_data[index.index()]
-        } else {
-            // SAFETY: The index should always be in bounds.
-            unsafe { self.term_data.get_unchecked(index.index()) }
-        }
     }
 }
