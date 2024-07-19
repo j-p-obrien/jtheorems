@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::terms::primitives::{naturals::NaturalType, universe::UniverseLevel};
+use crate::terms::primitives::universe::UniverseLevel;
 
 use super::{
     context_tree::Context,
@@ -42,8 +42,8 @@ impl Terminal {
         self.judgement.judgement_type()
     }
 
-    pub(super) fn context_ptr(&self) -> Context {
-        self.judgement.context_ptr()
+    pub(super) fn context(&self) -> Context {
+        self.judgement.context()
     }
 
     /// If the Judgement is a Type and the given name is not taken, we can introduce a FreeVariable
@@ -53,10 +53,10 @@ impl Terminal {
     pub fn variable_introduction(&mut self, name: String) -> JResult {
         match self.judgement_type() {
             JudgementType::Type(typ) => {
-                if !self.domain.contains_name_at(&name, self.context_ptr()) {
-                    self.judgement = self
-                        .domain
-                        .variable_intro_at(name, *typ, self.context_ptr());
+                if !self.domain.contains_name_at(&name, self.context()) {
+                    self.judgement =
+                        self.domain
+                            .variable_introduction_at(name, *typ, self.context());
                     Ok(())
                 } else {
                     Err(JError::Illegal("Name already taken."))
@@ -78,7 +78,7 @@ impl Terminal {
     pub fn natural_formation(&mut self) -> JResult {
         match self.judgement_type() {
             JudgementType::WellFormed => {
-                self.judgement = self.domain.form_natural_type_at(self.context_ptr());
+                self.judgement = self.domain.natural_formation_at(self.context());
                 Ok(())
             }
             _ => Err(JError::Illegal(
@@ -88,30 +88,41 @@ impl Terminal {
     }
 
     pub fn universe_formation(&mut self, level: UniverseLevel) -> JResult {
-        todo!("Universe Formation")
+        match self.judgement_type() {
+            JudgementType::WellFormed => {
+                self.judgement = self.domain.universe_formation_at(level, self.context());
+                Ok(())
+            }
+            _ => Err(JError::Illegal(
+                "Judgement Type must be Well Formed in order to form a Universe.",
+            )),
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_natural_formation() {
-        assert_eq!(Terminal::new().natural_formation(), Ok(()));
-    }
+    use crate::terms::primitives::naturals::NaturalType;
 
     #[test]
     fn test_natural_variable_introduction() {
         let mut terminal = Terminal::new();
+        let natural_judgement: JudgementType = NaturalType.into();
+        let well_formed = JudgementType::well_formed();
+        let x = "x".to_string();
         assert_eq!(terminal.natural_formation(), Ok(()));
-        let x_name = "x".to_string();
-        assert_eq!(terminal.variable_introduction(x_name.clone()), Ok(()));
+        assert_eq!(terminal.judgement_type(), &natural_judgement);
+        assert_eq!(terminal.variable_introduction(x.clone()), Ok(()));
+        assert_eq!(terminal.judgement_type(), &well_formed);
         assert_eq!(terminal.natural_formation(), Ok(()));
+        assert_eq!(terminal.judgement_type(), &natural_judgement);
         assert_eq!(
-            terminal.variable_introduction("x".to_string()),
+            terminal.variable_introduction(x),
             Err(JError::Illegal("Name already taken."))
         );
-        assert_eq!(terminal.variable_introduction("y".to_string()), Ok(()))
+        assert_eq!(terminal.judgement_type(), &natural_judgement);
+        assert_eq!(terminal.variable_introduction("y".to_string()), Ok(()));
+        assert_eq!(terminal.judgement_type(), &well_formed);
     }
 }

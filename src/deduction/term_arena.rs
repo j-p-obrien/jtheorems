@@ -60,7 +60,7 @@ impl TermArena {
         }
     }
 
-    pub(super) fn push_variable(&mut self, name: String, typ: Type) -> FreeVariable {
+    pub(super) fn add_variable(&mut self, name: String, typ: Type) -> FreeVariable {
         let ptr: TermPtr = self.term_data.len().into();
         let variable_data = VariableData::new(name, typ);
         self.term_data.push(variable_data.into());

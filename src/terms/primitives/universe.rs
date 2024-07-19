@@ -12,17 +12,15 @@ pub struct Universe {
     level: UniverseLevel,
 }
 
-impl Into<Type> for Universe {
-    fn into(self) -> Type {
-        //Type::Universe(self)
-        todo!()
+impl From<Universe> for Type {
+    fn from(universe: Universe) -> Self {
+        Type::Universe(universe)
     }
 }
 
-impl Into<JudgementType> for Universe {
-    fn into(self) -> JudgementType {
-        //JudgementType::Type(Type::Universe(self))
-        todo!()
+impl From<Universe> for JudgementType {
+    fn from(universe: Universe) -> Self {
+        JudgementType::Type(Type::Universe(universe))
     }
 }
 

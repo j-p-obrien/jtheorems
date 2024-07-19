@@ -45,9 +45,9 @@ impl Judgement {
         }
     }
 
-    pub(super) fn well_formed_at(location: Context) -> Self {
+    pub(super) fn well_formed_at(context: Context) -> Self {
         Self {
-            context_ptr: location,
+            context_ptr: context,
             judgement_type: JudgementType::well_formed(),
         }
     }
@@ -56,7 +56,7 @@ impl Judgement {
         &self.judgement_type
     }
 
-    pub(super) fn context_ptr(&self) -> Context {
+    pub(super) fn context(&self) -> Context {
         self.context_ptr
     }
 }

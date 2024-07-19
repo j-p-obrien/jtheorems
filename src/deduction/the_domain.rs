@@ -1,4 +1,10 @@
-use crate::terms::{primitives::naturals::NaturalType, types::Type};
+use crate::terms::{
+    primitives::{
+        naturals::NaturalType,
+        universe::{Universe, UniverseLevel},
+    },
+    types::Type,
+};
 
 use super::{
     context_tree::{Context, ContextTree},
@@ -22,29 +28,42 @@ impl TheDomain {
         }
     }
 
-    pub(super) fn contains_name_at(&self, name: &str, location: Context) -> bool {
+    pub(super) fn contains_name_at(&self, name: &str, context: Context) -> bool {
         self.context_tree
-            .contains_name_at(name, location, &self.term_data)
+            .contains_name_at(name, &self.term_data, context)
     }
 
-    pub(super) fn variable_intro_at(
+    pub(super) fn variable_introduction_at(
         &mut self,
         name: String,
         typ: Type,
-        location: Context,
+        context: Context,
     ) -> Judgement {
-        let variable = self.term_data.push_variable(name, typ);
-        let new_context_ptr = self.context_tree.variable_intro_at(variable, location);
-        Judgement::well_formed_at(new_context_ptr)
+        let variable = self.term_data.add_variable(name, typ);
+        let new_context = self
+            .context_tree
+            .variable_introduction_at(variable, context);
+        Judgement::well_formed_at(new_context)
     }
 
-    pub(super) fn form_natural_type_at(&mut self, context: Context) -> Judgement {
+    pub(super) fn natural_formation_at(&mut self, context: Context) -> Judgement {
         let naturals: JudgementType = NaturalType.into();
         // TODO: Decide whether or not to actually push this into the Context Tree. Naturals are
         // size zero and can be formed in any Context anyways.
         self.context_tree
-            .add_judgement_at(context, naturals.clone());
+            .add_judgement_at(naturals.clone(), context);
         Judgement::new(context, naturals)
+    }
+
+    pub(super) fn universe_formation_at(
+        &mut self,
+        level: UniverseLevel,
+        context: Context,
+    ) -> Judgement {
+        let universe: JudgementType = Universe::new(level).into();
+        self.context_tree
+            .add_judgement_at(universe.clone(), context);
+        Judgement::new(context, universe)
     }
 }
 
@@ -55,7 +74,7 @@ mod tests {
     #[test]
     fn test_natural_formation() {
         let mut domain = TheDomain::new();
-        let judgement = domain.form_natural_type_at(Context::empty_context());
+        let judgement = domain.natural_formation_at(Context::empty_context());
         assert_eq!(judgement.judgement_type(), &NaturalType.into());
     }
 }

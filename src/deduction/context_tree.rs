@@ -3,12 +3,9 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-use crate::terms::{types::Type, variable::FreeVariable, Term};
+use crate::terms::variable::FreeVariable;
 
-use super::{
-    judgement::{Judgement, JudgementType},
-    term_arena::TermArena,
-};
+use super::{judgement::JudgementType, term_arena::TermArena};
 
 type ContextPtr = usize;
 
@@ -85,12 +82,33 @@ impl Context {
     }
 }
 
-impl ContextTreeNode {
-    fn empty_context() -> Self {
-        Self::EmptyContext(EmptyContext {
+impl EmptyContext {
+    fn new() -> Self {
+        Self {
             constructed: vec![],
             reachable: vec![],
-        })
+        }
+    }
+}
+
+impl NonEmpty {
+    fn new(variable: FreeVariable, parent: Context) -> Self {
+        Self {
+            variable,
+            parent,
+            constructed: vec![],
+            reachable: vec![],
+        }
+    }
+}
+
+impl ContextTreeNode {
+    fn empty_context() -> Self {
+        Self::EmptyContext(EmptyContext::new())
+    }
+
+    fn new_context(variable: FreeVariable, parent: Context) -> Self {
+        Self::NonEmpty(NonEmpty::new(variable, parent))
     }
 
     fn add_judgement(&mut self, judgement_type: JudgementType) {
@@ -115,15 +133,15 @@ impl ContextTree {
         }
     }
 
-    pub(super) fn add_judgement_at(&mut self, location: Context, judgement_type: JudgementType) {
-        self[location].add_judgement(judgement_type)
+    pub(super) fn add_judgement_at(&mut self, judgement_type: JudgementType, context: Context) {
+        self[context].add_judgement(judgement_type)
     }
 
     /// This function should only be used if you have already checked that ContextPtr is
     /// not root and also is less than the length of the ContextTree (Which should hopefully always
     /// be the case anyways).
-    unsafe fn get_child_node_unchecked(&self, location: Context) -> &NonEmpty {
-        if let ContextTreeNode::NonEmpty(node) = &self[location] {
+    unsafe fn get_child_node_unchecked(&self, context: Context) -> &NonEmpty {
+        if let ContextTreeNode::NonEmpty(node) = &self[context] {
             node
         } else if cfg!(debug_assertions) {
             unreachable!("ContextPtr should not be root when this function is called.")
@@ -136,10 +154,10 @@ impl ContextTree {
     pub(super) fn contains_name_at(
         &self,
         name: &str,
-        location: Context,
         term_data: &TermArena,
+        context: Context,
     ) -> bool {
-        let mut current = location;
+        let mut current = context;
         loop {
             if current.is_empty_context() {
                 return false;
@@ -153,33 +171,25 @@ impl ContextTree {
         }
     }
 
-    pub(super) fn variable_intro_at(
+    /// Given the FreeVariable and the Context, this function creates a new Context with the
+    /// FreeVariable, adds it to the reachable Contexts for the old Context, and returns the new
+    /// Context.
+    pub(super) fn variable_introduction_at(
         &mut self,
         variable: FreeVariable,
-        location: Context,
+        context: Context,
     ) -> Context {
-        let new_node = ContextTreeNode::NonEmpty(NonEmpty {
-            variable,
-            parent: location,
-            constructed: vec![],
-            reachable: vec![],
-        });
-        let new_location: Context = self.nodes.len().into();
-        self[location].add_reachable_context(new_location);
+        let new_context: Context = self.nodes.len().into();
+        let new_node = ContextTreeNode::new_context(variable, context);
         self.nodes.push(new_node);
-        new_location
+        self[context].add_reachable_context(new_context);
+        new_context
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    fn push_variable_x() {
-        let mut term_data = TermArena::new();
-        let mut context_tree = ContextTree::new();
-        todo!()
-    }
 
     #[test]
     fn test_context_tree() {}
