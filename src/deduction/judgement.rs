@@ -1,5 +1,5 @@
 use super::context_tree::Context;
-use crate::terms::{types::Type, Term};
+use crate::term::{types::Type, Term};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum JudgementType {

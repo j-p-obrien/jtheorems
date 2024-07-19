@@ -3,7 +3,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-use crate::terms::variable::FreeVariable;
+use crate::term::variable::FreeVariable;
 
 use super::{judgement::JudgementType, term_arena::TermArena};
 
@@ -154,8 +154,8 @@ impl ContextTree {
     pub(super) fn contains_name_at(
         &self,
         name: &str,
-        term_data: &TermArena,
         context: Context,
+        term_data: &TermArena,
     ) -> bool {
         let mut current = context;
         loop {

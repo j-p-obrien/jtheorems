@@ -1,6 +1,6 @@
 use super::{super::Term, universe::Universe};
 
-use crate::{deduction::term_arena::TermPtr, terms::types::Type};
+use crate::{deduction::term_arena::TermPtr, term::types::Type};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IdentityTypeData {

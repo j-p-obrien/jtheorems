@@ -1,6 +1,6 @@
 use std::ops::Index;
 
-use crate::terms::{
+use crate::term::{
     types::Type,
     variable::{FreeVariable, VariableData},
     TermData,

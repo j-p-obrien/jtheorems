@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::{deduction::judgement::JudgementType, terms::Term};
+use crate::{deduction::judgement::JudgementType, term::Term};
 
 use super::{super::types::Type, universe::Universe};
 
@@ -12,14 +12,26 @@ const SUCC_DISPLAY: &str = "succ";
 pub struct NaturalType;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Zero();
+pub struct Zero;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Succ();
+pub struct Succ;
 
 impl Display for NaturalType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{NATURAL_DISPLAY}")
+    }
+}
+
+impl Display for Zero {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{ZERO_DISPLAY}")
+    }
+}
+
+impl Display for Succ {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{SUCC_DISPLAY}")
     }
 }
 

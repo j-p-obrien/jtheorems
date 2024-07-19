@@ -1,4 +1,4 @@
-use super::{term::Term, types::Type};
+use super::{terms::Term, types::Type};
 
 use crate::deduction::term_arena::TermPtr;
 

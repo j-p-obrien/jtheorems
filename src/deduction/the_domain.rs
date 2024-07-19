@@ -1,6 +1,6 @@
-use crate::terms::{
+use crate::term::{
     primitives::{
-        naturals::NaturalType,
+        naturals::{NaturalType, Zero},
         universe::{Universe, UniverseLevel},
     },
     types::Type,
@@ -8,6 +8,7 @@ use crate::terms::{
 
 use super::{
     context_tree::{Context, ContextTree},
+    error::JError,
     judgement::{Judgement, JudgementType},
     term_arena::TermArena,
 };
@@ -28,11 +29,6 @@ impl TheDomain {
         }
     }
 
-    pub(super) fn contains_name_at(&self, name: &str, context: Context) -> bool {
-        self.context_tree
-            .contains_name_at(name, &self.term_data, context)
-    }
-
     pub(super) fn variable_introduction_at(
         &mut self,
         name: String,
@@ -46,6 +42,21 @@ impl TheDomain {
         Judgement::well_formed_at(new_context)
     }
 
+    pub(super) fn try_variable_introduction_at(
+        &mut self,
+        name: String,
+        typ: Type,
+        context: Context,
+    ) -> Result<Judgement, JError> {
+        if self
+            .context_tree
+            .contains_name_at(&name, context, &self.term_data)
+        {
+            return Err(JError::NameTaken(name));
+        }
+        Ok(self.variable_introduction_at(name, typ, context))
+    }
+
     pub(super) fn natural_formation_at(&mut self, context: Context) -> Judgement {
         let naturals: JudgementType = NaturalType.into();
         // TODO: Decide whether or not to actually push this into the Context Tree. Naturals are
@@ -53,6 +64,14 @@ impl TheDomain {
         self.context_tree
             .add_judgement_at(naturals.clone(), context);
         Judgement::new(context, naturals)
+    }
+
+    pub(super) fn zero_formation_at(&mut self, context: Context) -> Judgement {
+        let zero: JudgementType = Zero.into();
+        // TODO: Decide whether or not to actually push this into the Context Tree. Zero is
+        // size zero and can be formed in any Context anyways.
+        self.context_tree.add_judgement_at(zero.clone(), context);
+        Judgement::new(context, zero)
     }
 
     pub(super) fn universe_formation_at(
