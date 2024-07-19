@@ -116,7 +116,13 @@ impl Terminal {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::term::primitives::{naturals::NaturalType, universe::Universe};
+    use crate::term::{
+        self,
+        primitives::{
+            naturals::{NaturalType, Zero},
+            universe::Universe,
+        },
+    };
 
     #[test]
     fn test_natural_variable_introduction() {
@@ -165,5 +171,16 @@ mod tests {
 
         assert_eq!(terminal.variable_introduction("B".to_string()), Ok(()));
         assert_eq!(terminal.judgement_type(), &well_formed);
+    }
+
+    #[test]
+    fn test_zero_formation() {
+        let mut terminal = Terminal::new();
+        let zero_judgement: JudgementType = Zero.into();
+        let well_formed = JudgementType::well_formed();
+
+        assert_eq!(terminal.zero_formation(), Ok(()));
+        assert_eq!(terminal.judgement_type(), &zero_judgement);
+        matches!(terminal.zero_formation(), Err(JError::Illegal(_)));
     }
 }
