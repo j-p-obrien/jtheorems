@@ -1,7 +1,10 @@
 use std::hint::unreachable_unchecked;
 
-use super::{types::Type, TermData};
-use crate::deduction::term_arena::{TermArena, TermPtr};
+use super::{types::Type, Term, TermData};
+use crate::deduction::{
+    judgement::JudgementType,
+    term_arena::{TermArena, TermPtr},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VariableData {
@@ -60,6 +63,18 @@ impl From<TermPtr> for FreeVariable {
 impl From<VariableData> for TermData {
     fn from(data: VariableData) -> Self {
         Self::Variable(data)
+    }
+}
+
+impl From<FreeVariable> for Term {
+    fn from(variable: FreeVariable) -> Self {
+        Term::FreeVariable(variable)
+    }
+}
+
+impl From<FreeVariable> for JudgementType {
+    fn from(variable: FreeVariable) -> Self {
+        JudgementType::Term(Term::FreeVariable(variable))
     }
 }
 

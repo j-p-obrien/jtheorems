@@ -5,48 +5,53 @@ use std::{
 
 use crate::term::variable::FreeVariable;
 
-use super::{judgement::JudgementType, term_arena::TermArena};
+use super::{
+    error::JError,
+    judgement::{Judgement, JudgementType},
+    term_arena::TermArena,
+    terminal::JResult,
+};
 
-type ContextPtr = usize;
+type ContextPtrSize = usize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) struct Context(ContextPtr);
+pub(super) struct ContextPtr(ContextPtrSize);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) struct EmptyContext {
+pub(super) struct Empty {
     constructed: Vec<JudgementType>,
-    reachable: Vec<Context>,
+    reachable: Vec<ContextPtr>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct NonEmpty {
     variable: FreeVariable,
-    parent: Context,
+    parent: ContextPtr,
     constructed: Vec<JudgementType>,
-    reachable: Vec<Context>,
+    reachable: Vec<ContextPtr>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) enum ContextTreeNode {
-    EmptyContext(EmptyContext),
+pub(super) enum Context {
+    Empty(Empty),
     NonEmpty(NonEmpty),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct ContextTree {
-    nodes: Vec<ContextTreeNode>,
+    nodes: Vec<Context>,
 }
 
-impl From<ContextPtr> for Context {
-    fn from(index: ContextPtr) -> Self {
+impl From<ContextPtrSize> for ContextPtr {
+    fn from(index: ContextPtrSize) -> Self {
         Self(index)
     }
 }
 
-impl Index<Context> for ContextTree {
-    type Output = ContextTreeNode;
+impl Index<ContextPtr> for ContextTree {
+    type Output = Context;
 
-    fn index(&self, index: Context) -> &Self::Output {
+    fn index(&self, index: ContextPtr) -> &Self::Output {
         if cfg!(debug_assertions) {
             &self.nodes[index.index()]
         } else {
@@ -56,8 +61,8 @@ impl Index<Context> for ContextTree {
     }
 }
 
-impl IndexMut<Context> for ContextTree {
-    fn index_mut(&mut self, index: Context) -> &mut Self::Output {
+impl IndexMut<ContextPtr> for ContextTree {
+    fn index_mut(&mut self, index: ContextPtr) -> &mut Self::Output {
         if cfg!(debug_assertions) {
             &mut self.nodes[index.index()]
         } else {
@@ -67,7 +72,7 @@ impl IndexMut<Context> for ContextTree {
     }
 }
 
-impl Context {
+impl ContextPtr {
     /// Creates a ContextPtr that points to the root of the ContextTree i.e. at index 0.
     pub(super) fn empty_context() -> Self {
         Self(0)
@@ -82,7 +87,7 @@ impl Context {
     }
 }
 
-impl EmptyContext {
+impl Empty {
     fn new() -> Self {
         Self {
             constructed: vec![],
@@ -92,7 +97,7 @@ impl EmptyContext {
 }
 
 impl NonEmpty {
-    fn new(variable: FreeVariable, parent: Context) -> Self {
+    fn new(variable: FreeVariable, parent: ContextPtr) -> Self {
         Self {
             variable,
             parent,
@@ -100,28 +105,32 @@ impl NonEmpty {
             reachable: vec![],
         }
     }
+
+    fn variable(&self) -> FreeVariable {
+        self.variable
+    }
 }
 
-impl ContextTreeNode {
+impl Context {
     fn empty_context() -> Self {
-        Self::EmptyContext(EmptyContext::new())
+        Self::Empty(Empty::new())
     }
 
-    fn new_context(variable: FreeVariable, parent: Context) -> Self {
+    fn new_context(variable: FreeVariable, parent: ContextPtr) -> Self {
         Self::NonEmpty(NonEmpty::new(variable, parent))
     }
 
     fn add_judgement(&mut self, judgement_type: JudgementType) {
         match self {
-            ContextTreeNode::EmptyContext(root) => root.constructed.push(judgement_type),
-            ContextTreeNode::NonEmpty(node) => node.constructed.push(judgement_type),
+            Context::Empty(root) => root.constructed.push(judgement_type),
+            Context::NonEmpty(node) => node.constructed.push(judgement_type),
         }
     }
 
-    fn add_reachable_context(&mut self, context: Context) {
+    fn add_reachable_context(&mut self, context: ContextPtr) {
         match self {
-            ContextTreeNode::EmptyContext(root) => root.reachable.push(context),
-            ContextTreeNode::NonEmpty(node) => node.reachable.push(context),
+            Context::Empty(root) => root.reachable.push(context),
+            Context::NonEmpty(node) => node.reachable.push(context),
         }
     }
 }
@@ -129,19 +138,22 @@ impl ContextTreeNode {
 impl ContextTree {
     pub(super) fn new() -> Self {
         Self {
-            nodes: vec![ContextTreeNode::empty_context()],
+            nodes: vec![Context::empty_context()],
         }
     }
 
-    pub(super) fn add_judgement_at(&mut self, judgement_type: JudgementType, context: Context) {
-        self[context].add_judgement(judgement_type)
+    pub(super) fn add_judgement_at(&mut self, judgement: JudgementType, context: ContextPtr) {
+        self[context].add_judgement(judgement)
     }
 
+    /// Sometimes we need to get the internal NonEmpty node of a ContextTreeNode after we've already
+    /// checked that it is not the empty Context. This is a fast way of returning that node.
+    ///
     /// This function should only be used if you have already checked that ContextPtr is
     /// not root and also is less than the length of the ContextTree (Which should hopefully always
     /// be the case anyways).
-    unsafe fn get_child_node_unchecked(&self, context: Context) -> &NonEmpty {
-        if let ContextTreeNode::NonEmpty(node) = &self[context] {
+    unsafe fn get_nonempty_node_unchecked(&self, context: ContextPtr) -> &NonEmpty {
+        if let Context::NonEmpty(node) = &self[context] {
             node
         } else if cfg!(debug_assertions) {
             unreachable!("ContextPtr should not be root when this function is called.")
@@ -154,7 +166,7 @@ impl ContextTree {
     pub(super) fn contains_name_at(
         &self,
         name: &str,
-        context: Context,
+        context: ContextPtr,
         term_data: &TermArena,
     ) -> bool {
         let mut current = context;
@@ -162,8 +174,8 @@ impl ContextTree {
             if current.is_empty_context() {
                 return false;
             }
-            // SAFETY: We have already checked that current is not root.
-            let node = unsafe { self.get_child_node_unchecked(current) };
+            // SAFETY: We have already checked that current is not the Empty Context.
+            let node = unsafe { self.get_nonempty_node_unchecked(current) };
             if node.variable.has_name(name, term_data) {
                 return true;
             }
@@ -177,13 +189,34 @@ impl ContextTree {
     pub(super) fn variable_introduction_at(
         &mut self,
         variable: FreeVariable,
-        context: Context,
-    ) -> Context {
-        let new_context: Context = self.nodes.len().into();
-        let new_node = ContextTreeNode::new_context(variable, context);
+        context: ContextPtr,
+    ) -> ContextPtr {
+        let new_context: ContextPtr = self.nodes.len().into();
+        let new_node = Context::new_context(variable, context);
         self.nodes.push(new_node);
         self[context].add_reachable_context(new_context);
         new_context
+    }
+
+    pub(super) fn try_variable_rule_at(
+        &mut self,
+        name: &str,
+        context: ContextPtr,
+        term_data: &TermArena,
+    ) -> JResult<FreeVariable> {
+        let mut current = context;
+        while !current.is_empty_context() {
+            // SAFETY: We have already checked that current is not the Empty Context.
+            let node = unsafe { self.get_nonempty_node_unchecked(current) };
+            let variable = node.variable();
+            if variable.has_name(name, term_data) {
+                let judgement: JudgementType = variable.into();
+                self.add_judgement_at(judgement, context);
+                return Ok(variable);
+            }
+            current = node.parent;
+        }
+        Err(JError::Illegal("Variable not found in Context."))
     }
 }
 

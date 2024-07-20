@@ -1,4 +1,4 @@
-use super::context_tree::Context;
+use super::context_tree::ContextPtr;
 use crate::term::{types::Type, Term};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -12,7 +12,7 @@ pub enum JudgementType {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Judgement {
-    context_ptr: Context,
+    context_ptr: ContextPtr,
     judgement_type: JudgementType,
 }
 
@@ -31,7 +31,7 @@ impl JudgementType {
 }
 
 impl Judgement {
-    pub(super) fn new(context: Context, judgement_type: JudgementType) -> Self {
+    pub(super) fn new(context: ContextPtr, judgement_type: JudgementType) -> Self {
         Self {
             context_ptr: context,
             judgement_type,
@@ -40,12 +40,12 @@ impl Judgement {
 
     pub(super) fn well_formed_empty_context() -> Self {
         Self {
-            context_ptr: Context::empty_context(),
+            context_ptr: ContextPtr::empty_context(),
             judgement_type: JudgementType::well_formed(),
         }
     }
 
-    pub(super) fn well_formed_at(context: Context) -> Self {
+    pub(super) fn well_formed_at(context: ContextPtr) -> Self {
         Self {
             context_ptr: context,
             judgement_type: JudgementType::well_formed(),
@@ -56,7 +56,12 @@ impl Judgement {
         &self.judgement_type
     }
 
-    pub(super) fn context(&self) -> Context {
+    pub(super) fn context(&self) -> ContextPtr {
         self.context_ptr
+    }
+
+    /// Changes the JudgementType to WellFormed without changing the Context.
+    pub(super) fn well_formed_in_context(&mut self) {
+        self.judgement_type = JudgementType::WellFormed;
     }
 }

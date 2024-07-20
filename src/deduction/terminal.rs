@@ -3,13 +3,13 @@ use std::fmt::Display;
 use crate::term::primitives::universe::UniverseLevel;
 
 use super::{
-    context_tree::Context,
+    context_tree::ContextPtr,
     error::JError,
     judgement::{Judgement, JudgementType},
     the_domain::TheDomain,
 };
 
-pub type JResult = Result<(), JError>;
+pub type JResult<T> = Result<T, JError>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// A Terminal is a window into The Domain, the central repository of all of terms and their
@@ -42,15 +42,22 @@ impl Terminal {
         self.judgement.judgement_type()
     }
 
-    pub(super) fn context(&self) -> Context {
+    pub(super) fn context(&self) -> ContextPtr {
         self.judgement.context()
+    }
+
+    /// Changes the JudgementType to WellFormed in the current Context.
+    ///
+    /// This may always be done.
+    pub fn well_formed_in_context(&mut self) {
+        self.judgement.well_formed_in_context();
     }
 
     /// If the Judgement is a Type and the given name is not taken, we can introduce a FreeVariable
     /// with that name.
     ///
     /// If the Judgement is any other variant or the name is taken we return an error.
-    pub fn variable_introduction(&mut self, name: String) -> JResult {
+    pub fn variable_introduction(&mut self, name: String) -> JResult<()> {
         match self.judgement_type() {
             JudgementType::Type(typ) => {
                 self.judgement =
@@ -64,15 +71,30 @@ impl Terminal {
         }
     }
 
-    pub fn variable_rule(&mut self) -> JResult {
-        todo!("Variable Rule")
+    /// Forms one of the variables in the current Context e.g. if we have a Context with variables
+    /// x: A, y: B then we can construct x:A and y:B. The Judgement would look like this:
+    /// x: A, y: B \vdash x: A or x: A, y: B \vdash y: B.
+    ///
+    /// This can be done whenever the JudgementType is WellFormed and there is a Variable with the
+    /// given name in the Context. If the JudgementType is not WellFormed or there are no variables in the
+    /// Context, returns an Error.
+    pub fn variable_rule(&mut self, name: &str) -> JResult<()> {
+        match self.judgement_type() {
+            JudgementType::WellFormed => {
+                self.judgement = self.domain.try_variable_rule_at(name, self.context())?;
+                Ok(())
+            }
+            _ => Err(JError::Illegal(
+                "Judgement Type must be Well Formed in order to apply the Variable Rule.",
+            )),
+        }
     }
 
     /// Forms the Natural Type.
     ///
     /// This can be done whenever the Judgement type is Well Formed. If the Judgement Type is not
     /// Well Formed, returns an Error.
-    pub fn natural_formation(&mut self) -> JResult {
+    pub fn natural_formation(&mut self) -> JResult<()> {
         match self.judgement_type() {
             JudgementType::WellFormed => {
                 self.judgement = self.domain.natural_formation_at(self.context());
@@ -84,7 +106,7 @@ impl Terminal {
         }
     }
 
-    pub fn zero_formation(&mut self) -> JResult {
+    pub fn zero_formation(&mut self) -> JResult<()> {
         match self.judgement_type() {
             JudgementType::WellFormed => {
                 self.judgement = self.domain.zero_formation_at(self.context());
@@ -100,7 +122,7 @@ impl Terminal {
     ///
     /// This can be done whenever the Judgement type is Well Formed. If the Judgement Type is not
     /// Well Formed, returns an Error.
-    pub fn universe_formation(&mut self, level: UniverseLevel) -> JResult {
+    pub fn universe_formation(&mut self, level: UniverseLevel) -> JResult<()> {
         match self.judgement_type() {
             JudgementType::WellFormed => {
                 self.judgement = self.domain.universe_formation_at(level, self.context());
@@ -122,6 +144,7 @@ mod tests {
             naturals::{NaturalType, Zero},
             universe::Universe,
         },
+        Term,
     };
 
     #[test]
@@ -177,10 +200,39 @@ mod tests {
     fn test_zero_formation() {
         let mut terminal = Terminal::new();
         let zero_judgement: JudgementType = Zero.into();
-        let well_formed = JudgementType::well_formed();
 
         assert_eq!(terminal.zero_formation(), Ok(()));
         assert_eq!(terminal.judgement_type(), &zero_judgement);
         matches!(terminal.zero_formation(), Err(JError::Illegal(_)));
+    }
+
+    #[test]
+    fn test_variable_rule() {
+        // TODO: Make these tests more robust i.e. test that the data is correct as well.
+        let mut terminal = Terminal::new();
+        let well_formed = JudgementType::well_formed();
+        let x = "x".to_string();
+        let y = "y".to_string();
+
+        assert_eq!(terminal.natural_formation(), Ok(()));
+        assert_eq!(terminal.variable_introduction(x.clone()), Ok(()));
+        assert_eq!(terminal.judgement_type(), &well_formed);
+
+        assert_eq!(terminal.natural_formation(), Ok(()));
+        assert_eq!(terminal.variable_introduction(y.clone()), Ok(()));
+        assert_eq!(terminal.judgement_type(), &well_formed);
+
+        assert_eq!(terminal.variable_rule(&x), Ok(()));
+        matches!(
+            terminal.judgement_type(),
+            JudgementType::Term(Term::FreeVariable(_))
+        );
+
+        terminal.well_formed_in_context();
+        assert_eq!(terminal.variable_rule(&y), Ok(()));
+        matches!(
+            terminal.judgement_type(),
+            JudgementType::Term(Term::FreeVariable(_))
+        );
     }
 }
