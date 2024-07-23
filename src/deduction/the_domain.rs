@@ -30,20 +30,13 @@ impl TheDomain {
         }
     }
 
-    pub(super) fn variable_introduction_at(
-        &mut self,
-        name: String,
-        typ: Type,
-        context: ContextPtr,
-    ) -> Judgement {
+    fn context_extension_at(&mut self, name: String, typ: Type, context: ContextPtr) -> Judgement {
         let variable = self.term_data.add_variable(name, typ);
-        let new_context = self
-            .context_tree
-            .variable_introduction_at(variable, context);
+        let new_context = self.context_tree.context_extension_at(variable, context);
         Judgement::well_formed_at(new_context)
     }
 
-    pub(super) fn try_variable_introduction_at(
+    pub(super) fn try_context_extension_at(
         &mut self,
         name: String,
         typ: Type,
@@ -55,17 +48,17 @@ impl TheDomain {
         {
             return Err(JError::NameTaken(name));
         }
-        Ok(self.variable_introduction_at(name, typ, context))
+        Ok(self.context_extension_at(name, typ, context))
     }
 
-    pub(super) fn try_variable_rule_at(
+    pub(super) fn try_variable_introduction_at(
         &mut self,
         name: &str,
         context: ContextPtr,
     ) -> JResult<Judgement> {
-        let variable = self
-            .context_tree
-            .try_variable_rule_at(name, context, &self.term_data)?;
+        let variable =
+            self.context_tree
+                .try_variable_introduction_at(name, context, &self.term_data)?;
         Ok(Judgement::new(context, variable.into()))
     }
 
@@ -78,7 +71,7 @@ impl TheDomain {
         Judgement::new(context, naturals)
     }
 
-    pub(super) fn zero_formation_at(&mut self, context: ContextPtr) -> Judgement {
+    pub(super) fn zero_introduction_at(&mut self, context: ContextPtr) -> Judgement {
         let zero: JudgementType = Zero.into();
         // TODO: Decide whether or not to actually push this into the Context Tree. Zero is
         // size zero and can be formed in any Context anyways.
@@ -95,6 +88,22 @@ impl TheDomain {
         self.context_tree
             .add_judgement_at(universe.clone(), context);
         Judgement::new(context, universe)
+    }
+
+    pub(super) fn try_pi_formation_at(
+        &mut self,
+        typ: Type,
+        context: ContextPtr,
+    ) -> JResult<Judgement> {
+        if context.is_empty_context() {
+            return Err(JError::Illegal(
+                "Context must not be empty to form a Product Type.",
+            ));
+        }
+        let pi_type = self
+            .context_tree
+            .pi_formation_at(typ, context, &mut self.term_data);
+        todo!("Implement try_pi_formation_at.");
     }
 }
 

@@ -57,12 +57,12 @@ impl Terminal {
     /// with that name.
     ///
     /// If the Judgement is any other variant or the name is taken we return an error.
-    pub fn variable_introduction(&mut self, name: String) -> JResult<()> {
+    pub fn context_extension(&mut self, name: String) -> JResult<()> {
         match self.judgement_type() {
             JudgementType::Type(typ) => {
                 self.judgement =
                     self.domain
-                        .try_variable_introduction_at(name, *typ, self.context())?;
+                        .try_context_extension_at(name, *typ, self.context())?;
                 Ok(())
             }
             _ => Err(JError::Illegal(
@@ -78,10 +78,12 @@ impl Terminal {
     /// This can be done whenever the JudgementType is WellFormed and there is a Variable with the
     /// given name in the Context. If the JudgementType is not WellFormed or there are no variables in the
     /// Context, returns an Error.
-    pub fn variable_rule(&mut self, name: &str) -> JResult<()> {
+    pub fn variable_introduction(&mut self, name: &str) -> JResult<()> {
         match self.judgement_type() {
             JudgementType::WellFormed => {
-                self.judgement = self.domain.try_variable_rule_at(name, self.context())?;
+                self.judgement = self
+                    .domain
+                    .try_variable_introduction_at(name, self.context())?;
                 Ok(())
             }
             _ => Err(JError::Illegal(
@@ -106,10 +108,14 @@ impl Terminal {
         }
     }
 
-    pub fn zero_formation(&mut self) -> JResult<()> {
+    /// Forms the Natural Number 0.
+    ///
+    /// This can be done whenever the JudgementType is WellFormed. If the JudgementType is not WellFormed,
+    /// returns an error.
+    pub fn zero_introduction(&mut self) -> JResult<()> {
         match self.judgement_type() {
             JudgementType::WellFormed => {
-                self.judgement = self.domain.zero_formation_at(self.context());
+                self.judgement = self.domain.zero_introduction_at(self.context());
                 Ok(())
             }
             _ => Err(JError::Illegal(
@@ -130,6 +136,29 @@ impl Terminal {
             }
             _ => Err(JError::Illegal(
                 "Judgement Type must be Well Formed in order to form a Universe.",
+            )),
+        }
+    }
+
+    pub fn pi_formation(&mut self) -> JResult<()> {
+        match self.judgement_type() {
+            JudgementType::Type(typ) => {
+                self.judgement = self.domain.try_pi_formation_at(*typ, self.context())?;
+                Ok(())
+            }
+            _ => Err(JError::Illegal(
+                "Judgement Type must be Type in order to form a Pi.",
+            )),
+        }
+    }
+
+    pub fn lambda_introduction(&mut self) -> JResult<()> {
+        match self.judgement_type() {
+            JudgementType::WellFormed => {
+                todo!()
+            }
+            _ => Err(JError::Illegal(
+                "Judgement Type must be Well Formed in order to form a Lambda.",
             )),
         }
     }
@@ -157,16 +186,16 @@ mod tests {
         assert_eq!(terminal.natural_formation(), Ok(()));
         assert_eq!(terminal.judgement_type(), &natural_judgement);
 
-        assert_eq!(terminal.variable_introduction(x.clone()), Ok(()));
+        assert_eq!(terminal.context_extension(x.clone()), Ok(()));
         assert_eq!(terminal.judgement_type(), &well_formed);
 
         assert_eq!(terminal.natural_formation(), Ok(()));
         assert_eq!(terminal.judgement_type(), &natural_judgement);
 
-        matches!(terminal.variable_introduction(x), Err(JError::NameTaken(_)));
+        matches!(terminal.context_extension(x), Err(JError::NameTaken(_)));
         assert_eq!(terminal.judgement_type(), &natural_judgement);
 
-        assert_eq!(terminal.variable_introduction("y".to_string()), Ok(()));
+        assert_eq!(terminal.context_extension("y".to_string()), Ok(()));
         assert_eq!(terminal.judgement_type(), &well_formed);
     }
 
@@ -180,19 +209,19 @@ mod tests {
         assert_eq!(terminal.universe_formation(0), Ok(()));
         assert_eq!(terminal.judgement_type(), &universe_judgement);
 
-        assert_eq!(terminal.variable_introduction(a.clone()), Ok(()));
+        assert_eq!(terminal.context_extension(a.clone()), Ok(()));
         assert_eq!(terminal.judgement_type(), &well_formed);
 
         assert_eq!(terminal.universe_formation(0), Ok(()));
         assert_eq!(terminal.judgement_type(), &universe_judgement);
 
         matches!(
-            terminal.variable_introduction(a.clone()),
+            terminal.context_extension(a.clone()),
             Err(JError::NameTaken(_))
         );
         assert_eq!(terminal.judgement_type(), &universe_judgement);
 
-        assert_eq!(terminal.variable_introduction("B".to_string()), Ok(()));
+        assert_eq!(terminal.context_extension("B".to_string()), Ok(()));
         assert_eq!(terminal.judgement_type(), &well_formed);
     }
 
@@ -201,9 +230,9 @@ mod tests {
         let mut terminal = Terminal::new();
         let zero_judgement: JudgementType = Zero.into();
 
-        assert_eq!(terminal.zero_formation(), Ok(()));
+        assert_eq!(terminal.zero_introduction(), Ok(()));
         assert_eq!(terminal.judgement_type(), &zero_judgement);
-        matches!(terminal.zero_formation(), Err(JError::Illegal(_)));
+        matches!(terminal.zero_introduction(), Err(JError::Illegal(_)));
     }
 
     #[test]
@@ -215,21 +244,21 @@ mod tests {
         let y = "y".to_string();
 
         assert_eq!(terminal.natural_formation(), Ok(()));
-        assert_eq!(terminal.variable_introduction(x.clone()), Ok(()));
+        assert_eq!(terminal.context_extension(x.clone()), Ok(()));
         assert_eq!(terminal.judgement_type(), &well_formed);
 
         assert_eq!(terminal.natural_formation(), Ok(()));
-        assert_eq!(terminal.variable_introduction(y.clone()), Ok(()));
+        assert_eq!(terminal.context_extension(y.clone()), Ok(()));
         assert_eq!(terminal.judgement_type(), &well_formed);
 
-        assert_eq!(terminal.variable_rule(&x), Ok(()));
+        assert_eq!(terminal.variable_introduction(&x), Ok(()));
         matches!(
             terminal.judgement_type(),
             JudgementType::Term(Term::FreeVariable(_))
         );
 
         terminal.well_formed_in_context();
-        assert_eq!(terminal.variable_rule(&y), Ok(()));
+        assert_eq!(terminal.variable_introduction(&y), Ok(()));
         matches!(
             terminal.judgement_type(),
             JudgementType::Term(Term::FreeVariable(_))

@@ -3,7 +3,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-use crate::term::variable::FreeVariable;
+use crate::term::{lambda::PiType, types::Type, variable::FreeVariable};
 
 use super::{
     error::JError,
@@ -82,7 +82,7 @@ impl ContextPtr {
         self.0
     }
 
-    fn is_empty_context(&self) -> bool {
+    pub(super) fn is_empty_context(&self) -> bool {
         self.0 == 0
     }
 }
@@ -152,7 +152,7 @@ impl ContextTree {
     /// This function should only be used if you have already checked that ContextPtr is
     /// not root and also is less than the length of the ContextTree (Which should hopefully always
     /// be the case anyways).
-    unsafe fn get_nonempty_node_unchecked(&self, context: ContextPtr) -> &NonEmpty {
+    unsafe fn get_nonempty_unchecked(&self, context: ContextPtr) -> &NonEmpty {
         if let Context::NonEmpty(node) = &self[context] {
             node
         } else if cfg!(debug_assertions) {
@@ -170,23 +170,21 @@ impl ContextTree {
         term_data: &TermArena,
     ) -> bool {
         let mut current = context;
-        loop {
-            if current.is_empty_context() {
-                return false;
-            }
+        while !current.is_empty_context() {
             // SAFETY: We have already checked that current is not the Empty Context.
-            let node = unsafe { self.get_nonempty_node_unchecked(current) };
+            let node = unsafe { self.get_nonempty_unchecked(current) };
             if node.variable.has_name(name, term_data) {
                 return true;
             }
             current = node.parent;
         }
+        false
     }
 
     /// Given the FreeVariable and the Context, this function creates a new Context with the
     /// FreeVariable, adds it to the reachable Contexts for the old Context, and returns the new
     /// Context.
-    pub(super) fn variable_introduction_at(
+    pub(super) fn context_extension_at(
         &mut self,
         variable: FreeVariable,
         context: ContextPtr,
@@ -198,7 +196,7 @@ impl ContextTree {
         new_context
     }
 
-    pub(super) fn try_variable_rule_at(
+    pub(super) fn try_variable_introduction_at(
         &mut self,
         name: &str,
         context: ContextPtr,
@@ -207,7 +205,7 @@ impl ContextTree {
         let mut current = context;
         while !current.is_empty_context() {
             // SAFETY: We have already checked that current is not the Empty Context.
-            let node = unsafe { self.get_nonempty_node_unchecked(current) };
+            let node = unsafe { self.get_nonempty_unchecked(current) };
             let variable = node.variable();
             if variable.has_name(name, term_data) {
                 let judgement: JudgementType = variable.into();
@@ -217,6 +215,15 @@ impl ContextTree {
             current = node.parent;
         }
         Err(JError::Illegal("Variable not found in Context."))
+    }
+
+    pub(super) fn pi_formation_at(
+        &mut self,
+        typ: Type,
+        context: ContextPtr,
+        term_data: &mut TermArena,
+    ) -> PiType {
+        todo!("Implement pi_formation_at.")
     }
 }
 
