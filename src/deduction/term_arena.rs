@@ -3,7 +3,7 @@ use std::ops::Index;
 use crate::term::{
     types::Type,
     variable::{FreeVariable, VariableData},
-    TermData,
+    Term, TermData,
 };
 
 const DEFAULT_CAPACITY: usize = 2_usize.pow(16);
@@ -64,6 +64,12 @@ impl TermArena {
         let ptr: TermPtr = self.term_data.len().into();
         let variable_data = VariableData::new(name, typ);
         self.term_data.push(variable_data.into());
+        ptr.into()
+    }
+
+    pub(super) fn add_term<T: From<TermPtr>>(&mut self, data: TermData) -> T {
+        let ptr: TermPtr = self.term_data.len().into();
+        self.term_data.push(data);
         ptr.into()
     }
 }

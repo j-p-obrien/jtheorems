@@ -106,8 +106,12 @@ impl NonEmpty {
         }
     }
 
-    fn variable(&self) -> FreeVariable {
+    pub(super) fn variable(&self) -> FreeVariable {
         self.variable
+    }
+
+    pub(super) fn parent(&self) -> ContextPtr {
+        self.parent
     }
 }
 
@@ -152,7 +156,7 @@ impl ContextTree {
     /// This function should only be used if you have already checked that ContextPtr is
     /// not root and also is less than the length of the ContextTree (Which should hopefully always
     /// be the case anyways).
-    unsafe fn get_nonempty_unchecked(&self, context: ContextPtr) -> &NonEmpty {
+    pub(super) unsafe fn get_nonempty_unchecked(&self, context: ContextPtr) -> &NonEmpty {
         if let Context::NonEmpty(node) = &self[context] {
             node
         } else if cfg!(debug_assertions) {

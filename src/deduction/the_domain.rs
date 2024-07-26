@@ -4,6 +4,7 @@ use crate::term::{
         universe::{Universe, UniverseLevel},
     },
     types::Type,
+    variable::{FreeVariable, VariableData},
 };
 
 use super::{
@@ -30,8 +31,22 @@ impl TheDomain {
         }
     }
 
+    fn contains_name_at(&self, name: &str, context: ContextPtr) -> bool {
+        let mut current = context;
+        while !current.is_empty_context() {
+            // SAFETY: We just checked that the context is non-empty.
+            let nonempty_context = unsafe { self.context_tree.get_nonempty_unchecked(current) };
+            if nonempty_context.variable().has_name(name, &self.term_data) {
+                return true;
+            }
+            current = nonempty_context.parent();
+        }
+        false
+    }
+
     fn context_extension_at(&mut self, name: String, typ: Type, context: ContextPtr) -> Judgement {
-        let variable = self.term_data.add_variable(name, typ);
+        let data = VariableData::new(name, typ).into();
+        let variable: FreeVariable = self.term_data.add_term(data);
         let new_context = self.context_tree.context_extension_at(variable, context);
         Judgement::well_formed_at(new_context)
     }
@@ -42,10 +57,7 @@ impl TheDomain {
         typ: Type,
         context: ContextPtr,
     ) -> JResult<Judgement> {
-        if self
-            .context_tree
-            .contains_name_at(&name, context, &self.term_data)
-        {
+        if self.contains_name_at(&name, context) {
             return Err(JError::NameTaken(name));
         }
         Ok(self.context_extension_at(name, typ, context))
