@@ -17,7 +17,7 @@ pub(super) struct TermPtr {
     ptr: Ptr,
 }
 
-pub(super) enum Term {
+pub(crate) enum Term {
     Application(Application),
     InL(InL),
     InR(InR),

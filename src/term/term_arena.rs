@@ -1,5 +1,11 @@
 use super::terms::Term;
 
-struct TermArena {
+pub(crate) struct TermArena {
     data: Vec<Term>,
+}
+
+impl TermArena {
+    pub fn new() -> Self {
+        Self { data: Vec::new() }
+    }
 }
