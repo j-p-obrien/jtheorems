@@ -2,11 +2,12 @@ use super::types::TypePtr;
 
 type Index = u32;
 
-pub(super) struct BoundVariable {
+pub(crate) struct BoundVariable {
     index: Index,
     typ: TypePtr,
 }
 
-pub(super) struct FreeVariable {
+pub(crate) struct FreeVariable {
+    index: Index,
     typ: TypePtr,
 }

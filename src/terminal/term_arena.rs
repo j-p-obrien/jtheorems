@@ -1,4 +1,4 @@
-use super::terms::Term;
+use crate::term::terms::Term;
 
 pub(crate) struct TermArena {
     data: Vec<Term>,

@@ -1,5 +1,5 @@
-use crate::term::term_arena::{self, TermArena};
-use crate::term::terms::Term;
+use super::term_arena::TermArena;
+
 pub struct Terminal {
     term_arena: TermArena,
 }
