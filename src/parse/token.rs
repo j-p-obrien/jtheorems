@@ -11,6 +11,10 @@ pub(super) enum Token<'a> {
     LeftBrace,
     // }
     RightBrace,
+    // [
+    LeftBracket,
+    // ]
+    RightBracket,
     // :
     Colon,
     // =
@@ -27,13 +31,22 @@ pub(super) enum Token<'a> {
     LessThan,
     // ->
     RightArrow,
+    // =>
+    FatRightArrow,
 
     // Keywords
-    Keyword(KeyWord),
-}
-
-#[derive(Debug, PartialEq, Eq)]
-pub(super) enum KeyWord {
+    // def
     Def,
+    // Type
     Type,
+    // fn
+    Fn,
+
+    // Predefined Stuff
+    // Nat
+    Nat,
+    // succ
+    Succ,
+    // zero
+    Zero,
 }

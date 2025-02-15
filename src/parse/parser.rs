@@ -11,6 +11,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    // This is just here so I won't get fined (by Rust Analyzer for not using certain values).
     pub fn inc(&mut self) {
         self.lexer.next();
     }

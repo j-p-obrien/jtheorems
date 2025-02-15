@@ -17,6 +17,7 @@ impl Terminal {
 
     pub fn parse(&mut self, input: &str) {
         let mut parser = Parser::new(input);
+        parser.inc();
         todo!()
     }
 }
