@@ -1,8 +1,7 @@
-use jtheorems::{parse::parser::Parser, terminal::terminal::Terminal};
+use jtheorems::terminal::terminal::Terminal;
 
 fn main() {
-    let identity_function_signature = "def identity{A : U}(x:a) : A :=";
-    let mut parser = Parser::new(&identity_function_signature);
-    parser.inc();
     let mut terminal = Terminal::new();
+    let identity_function_signature = "def identity : {A : Type} -> A -> A :=";
+    terminal.parse(&identity_function_signature);
 }

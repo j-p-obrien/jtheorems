@@ -1,5 +1,11 @@
 use crate::term::variable::FreeVariable;
 
-struct LocalContext {
+pub(super) struct LocalContext {
     vars: Vec<FreeVariable>,
+}
+
+impl LocalContext {
+    pub(super) fn new() -> Self {
+        Self { vars: Vec::new() }
+    }
 }

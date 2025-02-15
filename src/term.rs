@@ -6,7 +6,7 @@ mod lambda;
 mod naturals;
 mod pair;
 pub(crate) mod terms;
-mod types;
+pub(crate) mod types;
 mod unit;
 mod universe;
 pub(crate) mod variable;

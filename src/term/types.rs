@@ -11,6 +11,7 @@ use super::{
     variable::{BoundVariable, FreeVariable},
 };
 
+#[derive(Debug)]
 pub(super) struct TypePtr {
     ptr: Ptr,
 }
