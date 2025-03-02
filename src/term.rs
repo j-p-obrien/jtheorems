@@ -1,4 +1,5 @@
 mod app;
+mod constant;
 mod coproduct;
 mod empty;
 mod identity;

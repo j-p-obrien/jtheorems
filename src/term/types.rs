@@ -16,6 +16,7 @@ pub(super) struct TypePtr {
     ptr: Ptr,
 }
 
+#[derive(Debug)]
 pub(super) enum Type {
     CoproductType(CoproductType),
     EmptyType(EmptyType),

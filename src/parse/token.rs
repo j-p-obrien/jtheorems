@@ -1,6 +1,10 @@
 #[derive(Debug, PartialEq, Eq)]
 pub(super) enum Token<'a> {
+    // Term identifiers
     Identifier(&'a str),
+    // Number Literals
+    // TODO: How do I want to represent numbers?
+    Number(&'a str),
 
     // Symbols
     // (
@@ -25,6 +29,10 @@ pub(super) enum Token<'a> {
     Plus,
     // -
     Minus,
+    // *
+    Star,
+    // /
+    Slash,
     // >
     GreaterThan,
     // <
@@ -44,9 +52,15 @@ pub(super) enum Token<'a> {
 
     // Predefined Stuff
     // Nat
-    Nat,
+    NatType,
     // succ
     Succ,
     // zero
     Zero,
+    // Empty
+    EmptyType,
+    // Unit
+    UnitType,
+    // refl
+    Refl,
 }

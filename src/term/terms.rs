@@ -1,5 +1,6 @@
 use super::{
     app::Application,
+    constant::Constant,
     coproduct::{CoproductType, InL, InR},
     empty::EmptyType,
     identity::{IdentityType, Refl},
@@ -13,12 +14,15 @@ use super::{
 
 pub(super) type Ptr = u32;
 
+#[derive(Debug)]
 pub(super) struct TermPtr {
     ptr: Ptr,
 }
 
+#[derive(Debug)]
 pub(crate) enum Term {
     Application(Application),
+    Constant(Constant),
     InL(InL),
     InR(InR),
     CoproductType(CoproductType),

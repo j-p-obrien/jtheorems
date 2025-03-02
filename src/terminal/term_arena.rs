@@ -5,7 +5,7 @@ pub(crate) struct TermArena {
 }
 
 impl TermArena {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self { data: Vec::new() }
     }
 }

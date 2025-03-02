@@ -61,8 +61,13 @@ impl<'a> Lexer<'a> {
         &self.input[start_index..=end_index]
     }
 
-    fn handle_N(&mut self, index: usize) -> Token<'a> {
-        todo!("Implement 'handle_N()' function.")
+    fn handle_n(&mut self, start_index: usize) -> Token<'a> {
+        let string = self.get_alphanumeric_starting_at(start_index);
+        if string == "Nat" {
+            Token::NatType
+        } else {
+            Token::Identifier(string)
+        }
     }
 }
 
@@ -86,7 +91,7 @@ impl<'a> Iterator for Lexer<'a> {
             '>' => Token::GreaterThan,
             'd' => self.handle_d(index),
             'T' => self.handle_T(index),
-            'N' => self.handle_N(index),
+            'N' => self.handle_n(index),
             chr if chr.is_alphabetic() => {
                 Token::Identifier(self.get_alphanumeric_starting_at(index))
             }
@@ -101,12 +106,12 @@ mod tests {
 
     #[test]
     fn test_identity_function_signature() {
-        let identity_definition = "def identity : {A:Type} -> A -> A :=";
-        let lexer = Lexer::new(&identity_definition);
+        let identity_signature = "def identity : {A:Type} -> A -> A :=";
+        let lexer = Lexer::new(&identity_signature);
         let tokens: Vec<_> = lexer.collect();
         assert_eq!(
-            tokens,
-            vec![
+            &tokens,
+            &[
                 Token::Def,
                 Token::Identifier("identity"),
                 Token::Colon,
@@ -125,23 +130,29 @@ mod tests {
     }
 
     #[test]
-    fn test_nat_add_function_signature() {
-        let add_definition = "def add : Nat -> Nat -> Nat :=";
-        let lexer = Lexer::new(&add_definition);
+    fn test_add_function_signature() {
+        let add_signature = "def add : Nat -> Nat -> Nat :=";
+        let lexer = Lexer::new(&add_signature);
         let tokens: Vec<_> = lexer.collect();
         assert_eq!(
-            tokens,
-            vec![
+            &tokens,
+            &[
                 Token::Def,
                 Token::Identifier("add"),
                 Token::Colon,
-                Token::Nat,
+                Token::NatType,
                 Token::RightArrow,
-                Token::Nat,
+                Token::NatType,
                 Token::RightArrow,
-                Token::Nat,
+                Token::NatType,
                 Token::ColonEquals,
             ]
         )
+    }
+
+    #[test]
+    fn test_unit_is_contractible() {
+        let unit_is_contractible_signature = r"def unit_is_contractible: (x : Unit) -> * = x :=";
+        todo!("Test lexing for unit_is_contractible function.")
     }
 }
