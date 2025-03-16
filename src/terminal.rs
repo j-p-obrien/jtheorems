@@ -1,3 +1,3 @@
-pub(crate) mod context;
-pub(crate) mod term_arena;
+pub(super) mod context;
+pub(super) mod parse;
 pub mod terminal;

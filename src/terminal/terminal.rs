@@ -1,25 +1,22 @@
-use crate::parse::parser::Parser;
+use super::context::Context;
 
-use super::{context::LocalContext, term_arena::TermArena};
+use super::parse::parser::Parser;
 
 pub struct Terminal {
     parser: Parser,
-    term_arena: TermArena,
-    context: LocalContext,
+    context: Context,
 }
 
 impl Terminal {
     pub fn new() -> Self {
         Self {
             parser: Parser::new(),
-            term_arena: TermArena::new(),
-            context: LocalContext::new(),
+            context: Context::new(),
         }
     }
 
     pub fn parse(&mut self, input: &str) {
-        self.parser
-            .parse(input, &mut self.context, &mut self.term_arena);
+        self.parser.parse(input, &mut self.context);
         todo!()
     }
 }

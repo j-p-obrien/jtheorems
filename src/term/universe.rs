@@ -1,6 +1,6 @@
 type UniverseLevel = u64;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(super) struct Universe {
     level: UniverseLevel,
 }

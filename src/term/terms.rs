@@ -12,14 +12,7 @@ use super::{
     variable::*,
 };
 
-pub(super) type Ptr = u32;
-
-#[derive(Debug)]
-pub(super) struct TermPtr {
-    ptr: Ptr,
-}
-
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) enum Term {
     Application(Application),
     Constant(Constant),

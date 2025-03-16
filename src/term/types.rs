@@ -11,13 +11,8 @@ use super::{
     variable::{BoundVariable, FreeVariable},
 };
 
-#[derive(Debug)]
-pub(super) struct TypePtr {
-    ptr: Ptr,
-}
-
-#[derive(Debug)]
-pub(super) enum Type {
+#[derive(Debug, Clone)]
+pub(crate) enum Type {
     CoproductType(CoproductType),
     EmptyType(EmptyType),
     IdentityType(IdentityType),
@@ -30,4 +25,10 @@ pub(super) enum Type {
     Universe(Universe),
     BoundVariable(BoundVariable),
     FreeVariable(FreeVariable),
+}
+
+impl Type {
+    pub(crate) fn has_name(&self) -> bool {
+        todo!()
+    }
 }

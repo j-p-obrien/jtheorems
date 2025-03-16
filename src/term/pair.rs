@@ -1,18 +1,20 @@
-use super::{terms::TermPtr, types::TypePtr, variable::BoundVariable};
+use crate::terminal::context::{TermPtr, TypePtr};
 
-#[derive(Debug)]
+use super::variable::BoundVariable;
+
+#[derive(Debug, Clone, Copy)]
 pub(super) struct Pair {
     left: TermPtr,
     right: TermPtr,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(super) struct ProductType {
     left: TypePtr,
     right: TypePtr,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(super) struct SigmaType {
     var: BoundVariable,
     body: TypePtr,

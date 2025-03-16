@@ -1,6 +1,6 @@
-use super::{terms::TermPtr, types::TypePtr};
+use crate::terminal::context::{TermPtr, TypePtr};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(super) struct Application {
     fun: TermPtr,
     arg: TermPtr,

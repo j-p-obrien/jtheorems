@@ -1,8 +1,8 @@
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(super) struct Zero();
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(super) struct Succ();
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(super) struct NaturalType;

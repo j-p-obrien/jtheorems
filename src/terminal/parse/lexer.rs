@@ -102,7 +102,7 @@ impl<'a> Iterator for Lexer<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::parse::{lexer::Lexer, token::Token};
+    use super::{super::token::Token, Lexer};
 
     #[test]
     fn test_identity_function_signature() {
