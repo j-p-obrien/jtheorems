@@ -8,6 +8,7 @@ pub(crate) type NamePtr = u32;
 #[derive(Debug)]
 pub enum ContextError {
     NameAlreadyTaken(String),
+    ConversionError,
 }
 
 #[derive(Debug)]
@@ -20,21 +21,13 @@ impl LocalContext {
         Self { vars: Vec::new() }
     }
 
-    pub(crate) fn add_variable(
+    fn add_variable(
         &mut self,
         name: &str,
         typ: Type,
         term_arena: &mut TermArena,
     ) -> Result<(), ContextError> {
-        if self
-            .vars
-            .iter()
-            .any(|&var| var.has_name(name) | term_arena.typ_has_name(&var.into(), name))
-        {
-            Err(ContextError::NameAlreadyTaken(name.into()))
-        } else {
-            todo!("Implement adding variables.")
-        }
+        todo!()
     }
 }
 
@@ -63,7 +56,7 @@ pub(super) struct Context {
 }
 
 impl Context {
-    pub(crate) fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self {
             local_context: LocalContext::new(),
             term_arena: TermArena::new(),
@@ -71,7 +64,45 @@ impl Context {
         }
     }
 
-    pub(crate) fn typ(&self, term: &Term) -> Type {
+    pub(super) fn try_variable_intro<T: TryInto<Type>>(
+        &mut self,
+        name: &str,
+        typ: T,
+    ) -> Result<FreeVariable, ContextError> {
         todo!()
+    }
+
+    pub(super) fn typ<T: Into<Term>>(&self, term: T) -> Type {
+        todo!()
+    }
+
+    pub(super) fn name<T: Into<Term>>(&self, term: T) -> &str {
+        todo!()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Context;
+    use crate::term::universe::Universe;
+
+    #[test]
+    fn create_context_for_identity_function() {
+        let a_name = "A";
+        let x_name = "x";
+        let mut context = Context::new();
+        let bottom_universe = Universe::new(0);
+        let a = context.try_variable_intro(a_name, bottom_universe).unwrap();
+        assert_eq!(context.name(a), a_name);
+        assert_eq!(context.typ(a), bottom_universe.into());
+        let x = context.try_variable_intro(x_name, a).unwrap();
+        assert_eq!(context.name(x), x_name);
+        assert_eq!(context.typ(x), a.try_into().unwrap());
+        assert!(context.try_variable_intro(x_name, bottom_universe).is_err());
+        assert!(context.try_variable_intro(x_name, a).is_err());
+        assert!(context.try_variable_intro(x_name, x).is_err());
+        assert!(context.try_variable_intro(a_name, bottom_universe).is_err());
+        assert!(context.try_variable_intro(a_name, a).is_err());
+        assert!(context.try_variable_intro(a_name, x).is_err());
     }
 }

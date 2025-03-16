@@ -1,13 +1,13 @@
 mod app;
 mod constant;
 mod coproduct;
-mod empty;
+pub(crate) mod empty;
 mod identity;
 mod lambda;
-mod naturals;
+pub(crate) mod naturals;
 mod pair;
 pub(crate) mod terms;
 pub(crate) mod types;
 mod unit;
-mod universe;
+pub(crate) mod universe;
 pub(crate) mod variable;
