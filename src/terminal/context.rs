@@ -1,3 +1,5 @@
+use std::convert::Infallible;
+
 use crate::term::terms::Term;
 use crate::term::{types::Type, variable::FreeVariable};
 
@@ -9,6 +11,13 @@ pub(crate) type NamePtr = u32;
 pub enum ContextError {
     NameAlreadyTaken(String),
     ConversionError,
+    Infallible,
+}
+
+impl From<Infallible> for ContextError {
+    fn from(value: Infallible) -> Self {
+        ContextError::Infallible
+    }
 }
 
 #[derive(Debug)]
@@ -64,12 +73,20 @@ impl Context {
         }
     }
 
-    pub(super) fn try_variable_intro<T: TryInto<Type>>(
+    pub(super) fn try_variable_intro<T>(
         &mut self,
         name: &str,
         typ: T,
-    ) -> Result<FreeVariable, ContextError> {
-        todo!()
+    ) -> Result<FreeVariable, ContextError>
+    where
+        T: TryInto<Type>,
+        ContextError: From<<T as TryInto<Type>>::Error>,
+    {
+        if let Ok(typ) = typ.try_into() {
+            todo!()
+        } else {
+            Err(ContextError::ConversionError)
+        }
     }
 
     pub(super) fn typ<T: Into<Term>>(&self, term: T) -> Type {

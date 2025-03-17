@@ -1,4 +1,4 @@
-use crate::terminal::context::{self, ContextError, NamePtr, TypePtr};
+use crate::terminal::context::{ContextError, NamePtr, TypePtr};
 
 use super::{terms::Term, types::Type};
 

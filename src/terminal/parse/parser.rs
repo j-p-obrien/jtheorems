@@ -101,7 +101,7 @@ mod tests {
 
     #[test]
     fn test_identity_function_parsing3() {
-        let identity_signature2 = "def identity(A:Type)(x:A): A :=";
+        let identity_signature2 = "def identity(A:Type)(x:A):A :=";
         let mut parser = Parser::new();
         let mut context = &mut Context::new();
         parser.parse(&identity_signature2, context);
